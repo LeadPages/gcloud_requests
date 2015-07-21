@@ -1,4 +1,4 @@
 # gcloud_requests
 
-A wrapper that mixes `gcloud` and `requests` to provider thread-safe
-client functionality to `datastore` and `cloud storage`.
+A wrapper that mixes `gcloud` and `requests` in order to provide
+thread-safe client functionality for `datastore` and `cloud storage`.
