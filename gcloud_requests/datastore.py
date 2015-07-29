@@ -8,4 +8,3 @@ from .requests_connection import DatastoreConnection
 
 credentials = gcloud.credentials.get_credentials()
 connection = DatastoreConnection(credentials=credentials)
-gcloud.datastore.set_default_connection(connection)

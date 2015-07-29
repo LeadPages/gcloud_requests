@@ -7,7 +7,7 @@ setup(
     version=__version__,
     packages=['gcloud_requests'],
     install_requires=[
-        'gcloud==0.6.0',
+        'gcloud==0.7.0',
         'requests==2.7.0',
     ]
 )

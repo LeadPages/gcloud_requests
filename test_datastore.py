@@ -1,10 +1,14 @@
-from gcloud_requests import datastore
+from gcloud import datastore
+from gcloud_requests import connection
 
 from threading import Thread
 
 
+client = datastore.Client(connection=connection.connection)
+
+
 def r():
-    forms = datastore.Query("Form").fetch()
+    forms = datastore.Query(client, "Form").fetch()
     for form in forms:
         print form
         datastore.put(form)
