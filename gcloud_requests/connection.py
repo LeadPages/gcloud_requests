@@ -7,4 +7,4 @@ from gcloud.datastore import *  # noqa
 from .requests_connection import DatastoreConnection
 
 credentials = gcloud.credentials.get_credentials()
-connection = DatastoreConnection(credentials=credentials)
+requests_connection = DatastoreConnection(credentials=credentials)

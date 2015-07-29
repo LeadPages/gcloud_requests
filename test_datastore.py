@@ -4,7 +4,7 @@ from gcloud_requests import connection
 from threading import Thread
 
 
-client = datastore.Client(connection=connection.connection)
+client = datastore.Client(connection=connection.requests_connection)
 
 
 def r():
