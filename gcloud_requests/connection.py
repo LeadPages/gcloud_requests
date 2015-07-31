@@ -1,10 +1,7 @@
 import gcloud.credentials
-import gcloud.datastore
 
-# Re-export everything from gcloud.datastore.
-from gcloud.datastore import *  # noqa
-
-from .requests_connection import DatastoreConnection
+from .requests_connection import DatastoreConnection, JSONConnection
 
 credentials = gcloud.credentials.get_credentials()
-requests_connection = DatastoreConnection(credentials=credentials)
+datastore_connection = DatastoreConnection(credentials=credentials)
+json_connection = JSONConnection(credentials=credentials)

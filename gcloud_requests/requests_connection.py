@@ -16,7 +16,7 @@ class ResponseProxy(object):
         if key == "status":
             return str(self.status)
 
-        return self.request.headers[key]
+        return self.response.headers[key]
 
     @property
     def status(self):
@@ -25,11 +25,11 @@ class ResponseProxy(object):
 
 class RequestsProxy(object):
     """Wraps a ``requests`` library :class:`.Session` instance and
-    exposes a `request` method that is compatible with the ``httplib2``
-    `request` method.
+    exposes a `request` method that is compatible with the
+    ``httplib2`` `request` method.
     """
 
-    def __init__(self, pool_size=10):
+    def __init__(self):
         self.session = requests.Session()
 
     def request(self, uri, method="GET", body=None, headers=None,
@@ -68,7 +68,7 @@ class DatastoreConnection(
     "A datastore-compatible connection."
 
 
-class StorageConnection(
+class JSONConnection(
         GCloudJSONConnection,
         RequestsConnectionMixin):
-    "A cloudstorage-compatible connection."
+    "A JSON-compatible connection."

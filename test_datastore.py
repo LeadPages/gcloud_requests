@@ -6,7 +6,7 @@ from gcloud_requests import connection
 from threading import Thread
 
 
-client = datastore.Client(connection=connection.requests_connection)
+client = datastore.Client(connection=connection.datastore_connection)
 ns = "gcloud-requests-{}".format(time.time())
 
 for i in range(10):
