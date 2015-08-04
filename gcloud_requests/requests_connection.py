@@ -34,6 +34,7 @@ class RequestsProxy(object):
 
     def __init__(self):
         self.session = requests.Session()
+        self.connections = {}
 
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=5, connection_type=None):
