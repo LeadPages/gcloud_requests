@@ -3,7 +3,7 @@ import requests
 
 from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
 from gcloud.connection import Connection as GCloudConnection
-from gcloud.connection import JSONConnection as GCloudJSONConnection
+from gcloud.storage.connection import Connection as GCloudStorageConnection
 
 logger = logging.getLogger(__file__)
 
@@ -68,7 +68,7 @@ class DatastoreConnection(
     "A datastore-compatible connection."
 
 
-class JSONConnection(
-        GCloudJSONConnection,
+class StorageConnection(
+        GCloudStorageConnection,
         RequestsConnectionMixin):
-    "A JSON-compatible connection."
+    "A Storage-compatible connection."
