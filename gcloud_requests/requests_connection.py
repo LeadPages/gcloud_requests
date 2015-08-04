@@ -8,18 +8,12 @@ from gcloud.storage.connection import Connection as GCloudStorageConnection
 logger = logging.getLogger(__file__)
 
 
-class ResponseProxy(object):
+class ResponseProxy(requests.structures.CaseInsensitiveDict):
     def __init__(self, response):
+        super(ResponseProxy, self).__init__()
         self.response = response
-
-    def __getitem__(self, key):
-        if key == "status":
-            return str(self.status)
-
-        return self.response.headers[key]
-
-    def get(self, key, default=None):
-        return self.response.headers.get(key, default)
+        self.update(response.headers)
+        self.update(status=str(self.status))
 
     @property
     def status(self):
