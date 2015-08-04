@@ -18,6 +18,9 @@ class ResponseProxy(object):
 
         return self.response.headers[key]
 
+    def get(self, key, default=None):
+        return self.response.headers.get(key, default)
+
     @property
     def status(self):
         return self.response.status_code
