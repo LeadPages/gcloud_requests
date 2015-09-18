@@ -4,8 +4,10 @@ import requests
 from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
 from gcloud.connection import Connection as GCloudConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
+from threading import local
 
 logger = logging.getLogger(__file__)
+_state = local()
 
 
 class ResponseProxy(requests.structures.CaseInsensitiveDict):
@@ -27,12 +29,19 @@ class RequestsProxy(object):
     """
 
     def __init__(self):
-        self.session = requests.Session()
+        # XXX: This is required for the proxy to have the correct shape.
         self.connections = {}
 
     def request(self, uri, method="GET", body=None, headers=None,
                 redirections=5, connection_type=None):
-        response = self.session.request(
+
+        # XXX: Ensure we use one connection-pooling session per thread.
+        session = getattr(_state, "session", None)
+        if session is None:
+            session = _state.session = requests.Session()
+
+        logger.debug("Using session {!r}.".format(session))
+        response = session.request(
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
         )
