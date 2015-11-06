@@ -1,5 +1,6 @@
 import logging
 import requests
+import time
 
 from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
 from gcloud.connection import Connection as GCloudConnection
@@ -33,7 +34,10 @@ class RequestsProxy(object):
         self.connections = {}
 
     def request(self, uri, method="GET", body=None, headers=None,
-                redirections=5, connection_type=None):
+                redirections=5, connection_type=None, retries=0):
+
+        # NOTE: `retries` is the number of retries there have been so
+        # far. It is passed in to/controlled by `_handle_error`.
 
         # XXX: Ensure we use one connection-pooling session per thread.
         session = getattr(_state, "session", None)
@@ -46,7 +50,32 @@ class RequestsProxy(object):
             allow_redirects=redirections > 0,
             timeout=(3.05, 5)
         )
+        if response.status_code >= 400:
+            response = self._handle_response_error(
+                response, retries,
+                uri=uri, method=method,
+                body=body, headers=headers,
+                redirections=redirections,
+                connection_type=connection_type
+            )
+
         return ResponseProxy(response), response.content
+
+    def _handle_response_error(self, response, retries, **kwargs):
+        """Provides a way for each connection wrapper to handle error
+        responses.
+
+        :param Response response:
+          An instance of :class:`.requests.Response`.
+        :param int retries:
+          The number of times :meth:`.request` has been called so far.
+        :param \**kwargs:
+          The parameters with which :meth:`.request` was called. The
+          `retries` parameter is excluded from `kwargs` intentionally.
+        :returns:
+          A :class:`.requests.Response`.
+        """
+        return response
 
 
 class RequestsConnectionMixin(GCloudConnection):
@@ -74,6 +103,36 @@ class DatastoreConnection(
         GCloudDatastoreConnection,
         RequestsConnectionMixin):
     "A datastore-compatible connection."
+
+    def _handle_response_error(self, response, retries, **kwargs):
+        """Handles Datastore response errors according to their documentation.
+
+        :param Response response:
+          An instance of :class:`.requests.Response`.
+        :param int retries:
+          The number of times :meth:`.request` has been called so far.
+        :param \**kwargs:
+          The parameters with which :meth:`.request` was called. The
+          `retries` parameter is excluded from `kwargs` intentionally.
+        :returns:
+          A :class:`.requests.Response`.
+
+        .. [#] https://cloud.google.com/datastore/docs/concepts/errors
+        """
+        if response.status_code == 500 and retries < 1 or \
+           response.status_code == 503 and retries < 2 or \
+           response.status_code == 403 and retries < 2 or \
+           response.status_code == 409 and retries < 1:
+            backoff = 2 ** retries + 0.33
+            logger.debug("Sleeping for %r before retrying failed request...", backoff)
+            time.sleep(backoff)
+            logger.debug("Retrying failed request...")
+            # XXX: We need to make sure we unwrap the response before we
+            # return back to the `request` method.
+            response_proxy, _ = self.request(retries=retries + 1, **kwargs)
+            return response_proxy.response
+
+        return response
 
 
 class StorageConnection(
