@@ -37,7 +37,7 @@ class RequestsProxy(object):
                 redirections=5, connection_type=None, retries=0):
 
         # NOTE: `retries` is the number of retries there have been so
-        # far. It is passed in to/controlled by `_handle_error`.
+        # far. It is passed in to/controlled by `_handle_response_error`.
 
         # XXX: Ensure we use one connection-pooling session per thread.
         session = getattr(_state, "session", None)
@@ -48,6 +48,9 @@ class RequestsProxy(object):
         response = session.request(
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
+            # XXX: The connect timeout is set to 3.05 based on a
+            # recommendation in requests' docs and the read timeout is
+            # arbitrary.
             timeout=(3.05, 5)
         )
         if response.status_code >= 400:
