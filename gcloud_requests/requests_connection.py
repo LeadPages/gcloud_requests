@@ -44,6 +44,7 @@ class RequestsProxy(object):
         response = session.request(
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
+            timeout=(3.05, 5)
         )
         return ResponseProxy(response), response.content
 
