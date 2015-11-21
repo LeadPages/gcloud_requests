@@ -9,6 +9,6 @@ setup(
     install_requires=[
         'gcloud==0.7.0',
         'requests==2.7.0',
-        'certifi'
+        'certifi==2015.09.06.2'
     ]
 )
