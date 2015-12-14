@@ -105,7 +105,7 @@ class DatastoreRequestsProxy(RequestsProxy):
            response.status_code == 503 and retries < 4 or \
            response.status_code == 403 and retries < 2 or \
            response.status_code == 409 and retries < 1:
-            backoff = 2 ** retries + 0.33
+            backoff = 2 ** retries
             logger.debug("Sleeping for %r before retrying failed request...", backoff)
             time.sleep(backoff)
             logger.debug("Retrying failed request...")
