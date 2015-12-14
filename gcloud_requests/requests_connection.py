@@ -101,11 +101,21 @@ class DatastoreRequestsProxy(RequestsProxy):
 
         .. [#] https://cloud.google.com/datastore/docs/concepts/errors
         """
+        content_type = response.headers.get("content-type", "")
+        if "application/json" in content_type:
+            json = response.json()
+            reasons = [error["reason"] for error in json["errors"]]
+            if "INVALID_ARGUMENT" in reasons or \
+               "PERMISSION_DENIED" in reasons or \
+               "RESOURCE_EXHAUSTED" in reasons or \
+               "FAILED_PRECONDITION" in reasons:
+                return response
+
         if response.status_code == 500 and retries < 1 or \
-           response.status_code == 503 and retries < 4 or \
-           response.status_code == 403 and retries < 2 or \
-           response.status_code == 409 and retries < 1:
-            backoff = 2 ** retries
+           response.status_code == 503 and retries < 5 or \
+           response.status_code == 403 and retries < 5 or \
+           response.status_code == 409 and retries < 3:
+            backoff = min(2 ** retries, 5)
             logger.debug("Sleeping for %r before retrying failed request...", backoff)
             time.sleep(backoff)
             logger.debug("Retrying failed request...")
