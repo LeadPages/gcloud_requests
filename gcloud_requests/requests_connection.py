@@ -81,31 +81,10 @@ class RequestsProxy(object):
         return response
 
 
-class RequestsConnectionMixin(GCloudConnection):
-    """This mixin injects itself into the MRO of any subclass of
-    :class:`.GCloudConnection` and overwrites the :meth:`.http` property
-    so that a :class:`.RequestsProxy` is used instead of an ``httplib2``
-    request object.
+class DatastoreRequestsProxy(RequestsProxy):
+    """A Datastore-specific RequestsProxy that handles retries according
+    to https://cloud.google.com/datastore/docs/concepts/errors.
     """
-
-    REQUESTS_PROXY_KEY = "__requests_proxy__"
-
-    @property
-    def http(self):
-        if not hasattr(self, self.REQUESTS_PROXY_KEY):
-            setattr(self, self.REQUESTS_PROXY_KEY, RequestsProxy())
-
-            self._http = getattr(self, self.REQUESTS_PROXY_KEY)
-            if self._credentials:
-                self._http = self._credentials.authorize(self._http)
-
-        return self._http
-
-
-class DatastoreConnection(
-        GCloudDatastoreConnection,
-        RequestsConnectionMixin):
-    "A datastore-compatible connection."
 
     def _handle_response_error(self, response, retries, **kwargs):
         """Handles Datastore response errors according to their documentation.
@@ -123,7 +102,7 @@ class DatastoreConnection(
         .. [#] https://cloud.google.com/datastore/docs/concepts/errors
         """
         if response.status_code == 500 and retries < 1 or \
-           response.status_code == 503 and retries < 2 or \
+           response.status_code == 503 and retries < 4 or \
            response.status_code == 403 and retries < 2 or \
            response.status_code == 409 and retries < 1:
             backoff = 2 ** retries + 0.33
@@ -136,6 +115,36 @@ class DatastoreConnection(
             return response_proxy.response
 
         return response
+
+
+class RequestsConnectionMixin(GCloudConnection):
+    """This mixin injects itself into the MRO of any subclass of
+    :class:`.GCloudConnection` and overwrites the :meth:`.http` property
+    so that a :class:`.RequestsProxy` is used instead of an ``httplib2``
+    request object.
+    """
+
+    REQUESTS_PROXY_CLASS = RequestsProxy
+    REQUESTS_PROXY_KEY = "__requests_proxy__"
+
+    @property
+    def http(self):
+        if not hasattr(self, self.REQUESTS_PROXY_KEY):
+            setattr(self, self.REQUESTS_PROXY_KEY, self.REQUESTS_PROXY_CLASS())
+
+            self._http = getattr(self, self.REQUESTS_PROXY_KEY)
+            if self._credentials:
+                self._http = self._credentials.authorize(self._http)
+
+        return self._http
+
+
+class DatastoreConnection(
+        GCloudDatastoreConnection,
+        RequestsConnectionMixin):
+    "A datastore-compatible connection."
+
+    REQUESTS_PROXY_CLASS = DatastoreRequestsProxy
 
 
 class StorageConnection(
