@@ -33,8 +33,8 @@ class RequestsProxy(object):
         # XXX: This is required for the proxy to have the correct shape.
         self.connections = {}
 
-    def request(self, uri, method="GET", body=None, headers=None,
-                redirections=5, connection_type=None, retries=0):
+    def _request(self, uri, method="GET", body=None, headers=None,
+                 redirections=5, connection_type=None, retries=0):
 
         # NOTE: `retries` is the number of retries there have been so
         # far. It is passed in to/controlled by `_handle_response_error`.
@@ -44,7 +44,7 @@ class RequestsProxy(object):
         if session is None:
             session = _state.session = requests.Session()
 
-        logger.debug("Using session {!r}.".format(session))
+        logger.debug("Using session={!r}, retries={!r}.".format(session, retries))
         response = session.request(
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
@@ -63,6 +63,13 @@ class RequestsProxy(object):
             )
 
         return ResponseProxy(response), response.content
+
+    # NOTE: This instance method will get replaced with a decorated
+    # version inside the connection object. The reason we keep both
+    # around is so we can refer to the un-decorated version when
+    # retrying requests. TODO: There is a small chance that some
+    # retries may fail because of this due to an expired access token.
+    request = _request
 
     def _handle_response_error(self, response, retries, **kwargs):
         """Provides a way for each connection wrapper to handle error
@@ -121,7 +128,7 @@ class DatastoreRequestsProxy(RequestsProxy):
             logger.debug("Retrying failed request...")
             # XXX: We need to make sure we unwrap the response before we
             # return back to the `request` method.
-            response_proxy, _ = self.request(retries=retries + 1, **kwargs)
+            response_proxy, _ = self._request(retries=retries + 1, **kwargs)
             return response_proxy.response
 
         return response
