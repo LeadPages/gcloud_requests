@@ -16,7 +16,7 @@ forms = client.query(kind="Form", namespace=ns).fetch()
 for form in forms:
     client.delete(form.key)
 
-for i in range(10):
+for i in range(100):
     e = datastore.Entity(key=client.key("Form", namespace=ns))
     e.update(x=i)
     client.put(e)
