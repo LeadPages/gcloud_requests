@@ -39,10 +39,16 @@ class RequestsProxy(object):
         # NOTE: `retries` is the number of retries there have been so
         # far. It is passed in to/controlled by `_handle_response_error`.
 
-        # XXX: Ensure we use one connection-pooling session per thread.
+        # Ensure we use one connection-pooling session per thread and
+        # make use of requests' internal retry mechanism. It will
+        # safely retry any requests that failed due to DNS lookup,
+        # socket errors, etc.
         session = getattr(_state, "session", None)
         if session is None:
             session = _state.session = requests.Session()
+            adapter = _state.adapter = requests.adapters.HTTPAdapter(max_retries=5)
+            session.mount("http://", adapter)
+            session.mount("https://", adapter)
 
         logger.debug("Using session={!r}, retries={!r}.".format(session, retries))
         response = session.request(
