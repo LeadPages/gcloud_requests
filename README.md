@@ -11,4 +11,4 @@ thread-safe client functionality for `datastore` and `cloud storage`.
 
 ## Contributing
 
-Please read [our contributor's guide.](./CONTRIBUTING.md).
+Please read [our contributor's guide](./CONTRIBUTING.md).
