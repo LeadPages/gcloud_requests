@@ -7,7 +7,7 @@ before_install:
   - rm -rf ./datastore && mkdir ./datastore
   - curl -o gcd.zip http://storage.googleapis.com/gcd/tools/gcd-v1beta2-rev1-3.0.2.zip
   - unzip gcd.zip
-  - ./gcd.sh create -d gcloud ./datastore
-  - ./gcd.sh start --testing --port=8080 ./datastore &
+  - ./gcd/gcd.sh create -d gcloud ./datastore
+  - ./gcd/gcd.sh start --testing --port=8080 ./datastore &
 install: "pip install -r requirements.txt"
 script: py.test
