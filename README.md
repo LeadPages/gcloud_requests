@@ -50,7 +50,7 @@ library (`httplib2`) is not threadsafe.
 
 Based on notes in [gcloud-python#926](https://github.com/GoogleCloudPlatform/gcloud-python/issues/926),
 [gcloud-python#908](https://github.com/GoogleCloudPlatform/gcloud-python/issues/908),
-and pgcloud-python#1214](https://github.com/GoogleCloudPlatform/gcloud-python/issues/1214),
+and [gcloud-python#1214](https://github.com/GoogleCloudPlatform/gcloud-python/issues/1214),
 this library replaces the underlying transport with [`requests`](http://python-requests.org).
 
 ## Running Tests
