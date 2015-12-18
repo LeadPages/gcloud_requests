@@ -8,6 +8,7 @@ setup(
     version=__version__,
     url="https://github.com/LeadPages/gcloud_requests",
     author="LeadPages",
+    author_email="opensource@leadpages.net",
     license="MIT",
     packages=["gcloud_requests"],
     install_requires=[
