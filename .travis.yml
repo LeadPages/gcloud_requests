@@ -10,6 +10,6 @@ before_install:
   - curl -o gcd.zip http://storage.googleapis.com/gcd/tools/$GCD_VERSION.zip
   - unzip gcd.zip
   - ./$GCD_VERSION/gcd.sh create -d gcloud ./datastore
-  - ./$GCD_VERSION/gcd.sh start --testing --port=8080 ./datastore &
+  - ./$GCD_VERSION/gcd.sh start --port=8080 ./datastore &
 install: "pip install -r requirements.txt"
-script: python tests/test_datastore.py
+script: "env PYTHONPATH=. python tests/test_datastore.py"
