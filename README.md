@@ -14,31 +14,43 @@ Thread-safe client functionality for gcloud-python via requests.
 pip install --upgrade gcloud_requests
 ```
 
-**Note** that at this time, only `gcloud==0.7.0` on Python 2.7 is
+**Note** that at this time, only `gcloud==0.8.0` on Python 2.7 is
 officially supported.
 
 ## Usage
 
-The library provides a new connection that can be passed in to the
-`gcloud.datastore.Client` constructor.
-
-### Google Cloud Datastore
+The library provides new HTTP objects that can be passed in to the
+`gcloud.*.Client` constructors (per supported API module). For example,
+to use the connection class (with proper retrying implemented) for
+Google Cloud Datastore:
 
 ```
 from gcloud import datastore
-from gcloud_requests import connection
+from gcloud_requests.connection import datastore_connection
 
-client = datastore.Client(connection=connection.datastore_connection)
+client = datastore.Client(http=datastore_connection.http)
 client.query(kind="EntityKind").fetch()
 ```
 
-### Google Cloud Storage
+and for Google Cloud Storage:
 
 ```
-client = gcloud.storage.Client(project="my-project")
-client._connection = connection.storage_connection
+from gcloud import storage
+from gcloud_requests.connection import storage_connection
+
+client = gcloud.storage.Client(http=storage_connection.http, project="my-project")
 bucket = client.get_bucket("my-bucket")
 ```
+
+The following connections are available:
+
+- `bigquery_connection`
+- `datastore_connection`
+- `dns_connection`
+- `pubsub_connection`
+- `resource_manager_connection`
+- `search_connection`
+- `storage_connection`
 
 ## Background
 
