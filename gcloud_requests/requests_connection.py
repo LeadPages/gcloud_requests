@@ -2,10 +2,15 @@ import logging
 import requests
 import time
 
-from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
-from gcloud.connection import Connection as GCloudConnection
-from gcloud.storage.connection import Connection as GCloudStorageConnection
 from threading import local
+from gcloud.connection import Connection as GCloudConnection
+from gcloud.bigquery.connection import Connection as GCloudBigQueryConnection
+from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
+from gcloud.dns.connection import Connection as GCloudDNSConnection
+from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
+from gcloud.resource_manager.connection import Connection as GCloudResourceManagerConnection
+from gcloud.search.connection import Connection as GCloudSearchConnection
+from gcloud.storage.connection import Connection as GCloudStorageConnection
 
 logger = logging.getLogger(__file__)
 _state = local()
@@ -162,12 +167,42 @@ class RequestsConnectionMixin(GCloudConnection):
         return self._http
 
 
+class BigQueryConnection(
+        GCloudBigQueryConnection,
+        RequestsConnectionMixin):
+    "A BigQuery-compatible connection."
+
+
 class DatastoreConnection(
         GCloudDatastoreConnection,
         RequestsConnectionMixin):
-    "A datastore-compatible connection."
+    "A Datastore-compatible connection."
 
     REQUESTS_PROXY_CLASS = DatastoreRequestsProxy
+
+
+class DNSConnection(
+        GCloudDNSConnection,
+        RequestsConnectionMixin):
+    "A DNS-compatible connection."
+
+
+class PubSubConnection(
+        GCloudPubSubConnection,
+        RequestsConnectionMixin):
+    "A PubSub-compatible connection."
+
+
+class ResourceManagerConnection(
+        GCloudResourceManagerConnection,
+        RequestsConnectionMixin):
+    "A Resource Manager-compatible connection."
+
+
+class SearchConnection(
+        GCloudSearchConnection,
+        RequestsConnectionMixin):
+    "A Search-compatible connection."
 
 
 class StorageConnection(
