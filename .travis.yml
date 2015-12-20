@@ -13,3 +13,6 @@ before_install:
   - ./$GCD_VERSION/gcd.sh start --port=8080 ./datastore &
 install: "pip install -r requirements.txt"
 script: "env PYTHONPATH=. python tests/test_datastore.py"
+addons:
+  code_climate:
+    repo_token: 1ae0e51788ad23c845e353566a8b245c4c2929035709105e2b8407d6ae2e2b51
