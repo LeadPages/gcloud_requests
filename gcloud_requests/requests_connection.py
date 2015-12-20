@@ -34,7 +34,8 @@ class RequestsProxy(object):
     """
 
     def __init__(self):
-        # XXX: This is required for the proxy to have the correct shape.
+        # NOTE: This property is required for the proxy to have the
+        # correct shape.
         self.connections = {}
 
     def _request(self, uri, method="GET", body=None, headers=None,
@@ -58,7 +59,7 @@ class RequestsProxy(object):
         response = session.request(
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
-            # XXX: The connect timeout is set to 3.05 based on a
+            # NOTE: The connect timeout is set to 3.05 based on a
             # recommendation in requests' docs and the read timeout is
             # arbitrary.
             timeout=(3.05, 7)
@@ -77,8 +78,9 @@ class RequestsProxy(object):
     # NOTE: This instance method will get replaced with a decorated
     # version inside the connection object. The reason we keep both
     # around is so we can refer to the un-decorated version when
-    # retrying requests. TODO: There is a small chance that some
-    # retries may fail because of this due to an expired access token.
+    # retrying requests.
+    # TODO: There is a chance that some retries may fail because of
+    # this (due to an expired access token, for example).
     request = _request
 
     def _handle_response_error(self, response, retries, **kwargs):
@@ -136,7 +138,7 @@ class DatastoreRequestsProxy(RequestsProxy):
             logger.debug("Sleeping for %r before retrying failed request...", backoff)
             time.sleep(backoff)
             logger.debug("Retrying failed request...")
-            # XXX: We need to make sure we unwrap the response before we
+            # NOTE: We need to make sure we unwrap the response before we
             # return back to the `request` method.
             response_proxy, _ = self._request(retries=retries + 1, **kwargs)
             return response_proxy.response
