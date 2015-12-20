@@ -5,6 +5,9 @@ from gcloud_requests import __version__
 setup(
     name="gcloud_requests",
     description="Thread-safe client functionality for gcloud-python via requests.",
+    long_description="""For documentation and usage examples, see the project on GitHub_.
+
+    .. _GitHub: https://github.com/LeadPages/gcloud_requests""",
     version=__version__,
     url="https://github.com/LeadPages/gcloud_requests",
     author="LeadPages",
