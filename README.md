@@ -10,7 +10,7 @@ Thread-safe client functionality for gcloud-python via requests.
 
 ## Installation
 
-```
+```bash
 pip install --upgrade gcloud_requests
 ```
 
@@ -24,7 +24,7 @@ The library provides new HTTP objects that can be passed in to the
 to use the connection class (with proper retrying implemented) for
 Google Cloud Datastore:
 
-```
+```python
 from gcloud import datastore
 from gcloud_requests.connection import datastore_connection
 
@@ -34,7 +34,7 @@ client.query(kind="EntityKind").fetch()
 
 and for Google Cloud Storage:
 
-```
+```python
 from gcloud import storage
 from gcloud_requests.connection import storage_connection
 
@@ -53,32 +53,41 @@ The following connections are available:
 
 ## Background
 
-The [gcloud-python](https://github.com/GoogleCloudPlatform/gcloud-python)
-library for accessing Google Cloud Platform services like Google Cloud
-Datastore, Google Cloud Storage, Google BigQuery, and others, relies on
-the `httplib2` library to handle the underlying Protobuf requests. This
-library (`httplib2`) is not threadsafe.
+The [gcloud-python][gcloud-python] library for accessing Google Cloud
+Platform services like Google Cloud Datastore, Google Cloud Storage,
+Google BigQuery, and others, relies on the `httplib2` library to handle
+the underlying Protobuf requests. This library (`httplib2`) is not
+threadsafe.
 
-Based on notes in [gcloud-python#926](https://github.com/GoogleCloudPlatform/gcloud-python/issues/926),
-[gcloud-python#908](https://github.com/GoogleCloudPlatform/gcloud-python/issues/908),
-and [gcloud-python#1214](https://github.com/GoogleCloudPlatform/gcloud-python/issues/1214),
-this library replaces the underlying transport with [`requests`](http://python-requests.org).
+Based on notes in [gcloud-python#926][issue-926], [gcloud-python#908][issue-908],
+and [gcloud-python#1214][issue-1214], this library replaces the
+underlying transport with [`requests`][requests].
 
 ## Running Tests
 
 It's strongly encouraged that you **let Travis run the tests**. This is
 because running the tests requires `gcd`, the Google Cloud Datastore
 tools, which also requires a Google Cloud Platform service key...if
-you're still intrigued, work through the [`gcd documentation`](https://cloud.google.com/datastore/docs/tools/)
-and then simply install `pytest` and run the tests with `py.test`.
+you're still intrigued, work through the [`gcd documentation`][gcd] and
+then simply install `pytest` and run the tests with `py.test`.
 
 ## Authors
 
-`gcloud_requests` was authored at [LeadPages](http://leadpages.net). You
-can find out more about contributors [here](https://github.com/LeadPages/gcloud_requests/graphs/contributors)
-We welcome contributions, and [we're always looking](http://www.leadpages.net/careers) for more
+`gcloud_requests` was authored at [LeadPages][leadpages]. You can
+find out more about contributors [here][contributors]. We welcome
+contributions, and [we're always looking][careers] for more
 engineering talent!
 
 ## Contributing
 
 Please read [our contributor's guide](./CONTRIBUTING.md).
+
+[leadpages]: http://leadpages.net
+[careers]: http://www.leadpages.net/careers
+[contributors]: https://github.com/LeadPages/gcloud_requests/graphs/contributors
+[gcd]: https://cloud.google.com/datastore/docs/tools/
+[gcloud-python]: https://github.com/GoogleCloudPlatform/gcloud-python
+[requests]: http://python-requests.org
+[issue-908]: https://github.com/GoogleCloudPlatform/gcloud-python/issues/908
+[issue-926]: https://github.com/GoogleCloudPlatform/gcloud-python/issues/926
+[issue-1214]: https://github.com/GoogleCloudPlatform/gcloud-python/issues/1214
