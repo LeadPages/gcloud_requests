@@ -49,7 +49,6 @@ The following connections are available:
 - `dns_connection`
 - `pubsub_connection`
 - `resource_manager_connection`
-- `search_connection`
 - `storage_connection`
 
 ## Background

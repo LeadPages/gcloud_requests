@@ -6,7 +6,6 @@ from .requests_connection import (
     DNSConnection,
     PubSubConnection,
     ResourceManagerConnection,
-    SearchConnection,
     StorageConnection
 )
 
@@ -17,5 +16,4 @@ datastore_connection = DatastoreConnection(credentials=credentials)
 dns_connection = DNSConnection(credentials=credentials)
 pubsub_connection = PubSubConnection(credentials=credentials)
 resource_manager_connection = ResourceManagerConnection(credentials=credentials)
-search_connection = SearchConnection(credentials=credentials)
 storage_connection = StorageConnection(credentials=credentials)

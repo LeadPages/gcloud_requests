@@ -9,7 +9,6 @@ from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
 from gcloud.dns.connection import Connection as GCloudDNSConnection
 from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.resource_manager.connection import Connection as GCloudResourceManagerConnection
-from gcloud.search.connection import Connection as GCloudSearchConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
 
 logger = logging.getLogger(__file__)
@@ -197,12 +196,6 @@ class ResourceManagerConnection(
         GCloudResourceManagerConnection,
         RequestsConnectionMixin):
     "A Resource Manager-compatible connection."
-
-
-class SearchConnection(
-        GCloudSearchConnection,
-        RequestsConnectionMixin):
-    "A Search-compatible connection."
 
 
 class StorageConnection(
