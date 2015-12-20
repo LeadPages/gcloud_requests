@@ -3,13 +3,13 @@ import multiprocessing
 import time
 
 from gcloud import datastore
-from gcloud_requests import connection
+from gcloud_requests.connection import datastore_connection
 
 from threading import Thread
 
 logging.basicConfig(level=logging.DEBUG)
 
-client = datastore.Client(connection=connection.datastore_connection)
+client = datastore.Client(http=datastore_connection.http)
 ns = "gcloud-requests-{}".format(time.time())
 
 forms = client.query(kind="Form", namespace=ns).fetch()
