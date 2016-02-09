@@ -1,14 +1,8 @@
 import requests
 import time
 
+from datetime import datetime
 from threading import local
-from gcloud.connection import Connection as GCloudConnection
-from gcloud.bigquery.connection import Connection as GCloudBigQueryConnection
-from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
-from gcloud.dns.connection import Connection as GCloudDNSConnection
-from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
-from gcloud.resource_manager.connection import Connection as GCloudResourceManagerConnection
-from gcloud.storage.connection import Connection as GCloudStorageConnection
 
 from . import logger
 
@@ -33,10 +27,18 @@ class RequestsProxy(object):
     ``httplib2`` `request` method.
     """
 
-    def __init__(self):
-        # NOTE: This property is required for the proxy to have the
-        # correct shape.
+    def __new__(cls, credentials):
+        # We want to both pass in the credentials to the instance and
+        # at the same time decorate the resulting instance with those
+        # credentials.
+        instance = super(RequestsProxy, cls).__new__(cls, credentials)
+        return credentials.authorize(instance)
+
+    def __init__(self, credentials):
+        # The connections property is required for the proxy to have
+        # the correct shape.
         self.connections = {}
+        self.credentials = credentials
 
     def _request(self, uri, method="GET", body=None, headers=None,
                  redirections=5, connection_type=None, retries=0):
@@ -79,9 +81,32 @@ class RequestsProxy(object):
     # version inside the connection object. The reason we keep both
     # around is so we can refer to the un-decorated version when
     # retrying requests.
-    # TODO: There is a chance that some retries may fail because of
-    # this (due to an expired access token, for example).
     request = _request
+
+    @property
+    def _credentials_expire_in(self):
+        """The number of seconds until the current set of credentials
+        expire. 0 if the credentials have already expired.
+        """
+        if not self.credentials.token_expiry:
+            return 0
+        return max(0, (self.credentials.token_expiry - datetime.utcnow()).total_seconds())
+
+    def _retry(self, retries, **kwargs):
+        """This method inspects the oauth credentials to determine
+        whether or not it is safe to retry a request without refreshing
+        them. If it is not safe, this method will call the decorated
+        request method, causing it to refresh its credentials and to
+        make a valid request -- with the side effect of essentially
+        restarting the current retry cycle.
+        """
+        expiration_window = self._credentials_expire_in
+        logger.debug("Credentials will expire in %r...", expiration_window)
+
+        if expiration_window < 15:
+            logger.warning("Credentials expiration window is too small. Performing a hard retry...")
+            return self.request(**kwargs)
+        return self._request(retries=retries, **kwargs)
 
     def _handle_response_error(self, response, retries, **kwargs):
         """Provides a way for each connection wrapper to handle error
@@ -137,70 +162,9 @@ class DatastoreRequestsProxy(RequestsProxy):
             backoff = min(0.0625 * 2 ** retries, 1.0)
             logger.debug("Sleeping for %r before retrying failed request...", backoff)
             time.sleep(backoff)
+
             logger.debug("Retrying failed request...")
-            # NOTE: We need to make sure we unwrap the response before we
-            # return back to the `request` method.
-            response_proxy, _ = self._request(retries=retries + 1, **kwargs)
+            response_proxy, _ = self._retry(retries=retries + 1, **kwargs)
             return response_proxy.response
 
         return response
-
-
-class RequestsConnectionMixin(GCloudConnection):
-    """This mixin injects itself into the MRO of any subclass of
-    :class:`.GCloudConnection` and overwrites the :meth:`.http` property
-    so that a :class:`.RequestsProxy` is used instead of an ``httplib2``
-    request object.
-    """
-
-    REQUESTS_PROXY_CLASS = RequestsProxy
-    REQUESTS_PROXY_KEY = "__requests_proxy__"
-
-    @property
-    def http(self):
-        if not hasattr(self, self.REQUESTS_PROXY_KEY):
-            setattr(self, self.REQUESTS_PROXY_KEY, self.REQUESTS_PROXY_CLASS())
-
-            self._http = getattr(self, self.REQUESTS_PROXY_KEY)
-            if self._credentials:
-                self._http = self._credentials.authorize(self._http)
-
-        return self._http
-
-
-class BigQueryConnection(
-        GCloudBigQueryConnection,
-        RequestsConnectionMixin):
-    "A BigQuery-compatible connection."
-
-
-class DatastoreConnection(
-        GCloudDatastoreConnection,
-        RequestsConnectionMixin):
-    "A Datastore-compatible connection."
-
-    REQUESTS_PROXY_CLASS = DatastoreRequestsProxy
-
-
-class DNSConnection(
-        GCloudDNSConnection,
-        RequestsConnectionMixin):
-    "A DNS-compatible connection."
-
-
-class PubSubConnection(
-        GCloudPubSubConnection,
-        RequestsConnectionMixin):
-    "A PubSub-compatible connection."
-
-
-class ResourceManagerConnection(
-        GCloudResourceManagerConnection,
-        RequestsConnectionMixin):
-    "A Resource Manager-compatible connection."
-
-
-class StorageConnection(
-        GCloudStorageConnection,
-        RequestsConnectionMixin):
-    "A Storage-compatible connection."
