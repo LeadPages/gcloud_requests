@@ -2,6 +2,11 @@ import requests
 import time
 
 from datetime import datetime
+from gcloud.bigquery.connection import Connection as GCloudBigQueryConnection
+from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
+from gcloud.dns.connection import Connection as GCloudDNSConnection
+from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
+from gcloud.storage.connection import Connection as GCloudStorageConnection
 from threading import local
 
 from . import logger
@@ -27,10 +32,14 @@ class RequestsProxy(object):
     ``httplib2`` `request` method.
     """
 
+    SCOPE = None
+
     def __new__(cls, credentials):
         # We want to both pass in the credentials to the instance and
         # at the same time decorate the resulting instance with those
         # credentials.
+        if credentials.create_scoped_required():
+            credentials = credentials.create_scoped(cls.SCOPE)
         instance = super(RequestsProxy, cls).__new__(cls, credentials)
         return credentials.authorize(instance)
 
@@ -125,10 +134,19 @@ class RequestsProxy(object):
         return response
 
 
+class BigQueryRequestsProxy(RequestsProxy):
+    SCOPE = GCloudBigQueryConnection.SCOPE
+
+
 class DatastoreRequestsProxy(RequestsProxy):
-    """A Datastore-specific RequestsProxy that handles retries according
-    to https://cloud.google.com/datastore/docs/concepts/errors.
+    """A Datastore-specific RequestsProxy.
+
+    This proxy handles retries according to [1].
+
+    [1]: https://cloud.google.com/datastore/docs/concepts/errors.
     """
+
+    SCOPE = GCloudDatastoreConnection.SCOPE
 
     def _handle_response_error(self, response, retries, **kwargs):
         """Handles Datastore response errors according to their documentation.
@@ -168,3 +186,15 @@ class DatastoreRequestsProxy(RequestsProxy):
             return response_proxy.response
 
         return response
+
+
+class DNSRequestsProxy(RequestsProxy):
+    SCOPE = GCloudDNSConnection.SCOPE
+
+
+class PubSubRequestsProxy(RequestsProxy):
+    SCOPE = GCloudPubSubConnection.SCOPE
+
+
+class StorageRequestsProxy(RequestsProxy):
+    SCOPE = GCloudStorageConnection.SCOPE

@@ -32,11 +32,11 @@ client = datastore.Client(http=datastore_http)
 client.query(kind="EntityKind").fetch()
 ```
 
-and for other services:
+and for the Google Cloud Storage service:
 
 ```python
 from gcloud import storage
-from gcloud_requests.connection import requests_http
+from gcloud_requests.connection import storage_http
 
 client = storage.Client(http=storage_http, project="my-project")
 bucket = client.get_bucket("my-bucket")
@@ -49,16 +49,6 @@ Credentials objects you pass into them manually. If you need to use a
 custom set of credentials with `gcloud_requests` you must instantiate
 a `RequestsProxy` object by passing in those credentials and then
 passing that instance to your client like so:
-
-``` python
-from gcloud import storage
-from gcloud_requests.requests_connection import RequestsProxy
-
-http = RequestsProxy(custom_credentials)
-client = storage.Client(http=http)
-```
-
-For Datastore you should use `DatastoreRequestsProxy` instead:
 
 ``` python
 from gcloud import datastore
