@@ -14,7 +14,7 @@ Thread-safe client functionality for gcloud-python via requests.
 pip install --upgrade gcloud_requests
 ```
 
-**Note** that at this time, only `gcloud==0.8.0` on Python 2.7 is
+**Note** that at this time, only `gcloud==0.9.0` on Python 2.7 is
 officially supported.
 
 ## Usage
@@ -26,30 +26,47 @@ Google Cloud Datastore:
 
 ```python
 from gcloud import datastore
-from gcloud_requests.connection import datastore_connection
+from gcloud_requests.connection import datastore_http
 
-client = datastore.Client(http=datastore_connection.http)
+client = datastore.Client(http=datastore_http)
 client.query(kind="EntityKind").fetch()
 ```
 
-and for Google Cloud Storage:
+and for other services:
 
 ```python
 from gcloud import storage
-from gcloud_requests.connection import storage_connection
+from gcloud_requests.connection import requests_http
 
-client = gcloud.storage.Client(http=storage_connection.http, project="my-project")
+client = storage.Client(http=storage_http, project="my-project")
 bucket = client.get_bucket("my-bucket")
 ```
 
-The following connections are available:
+## Custom credentials
 
-- `bigquery_connection`
-- `datastore_connection`
-- `dns_connection`
-- `pubsub_connection`
-- `resource_manager_connection`
-- `storage_connection`
+Using a custom HTTP object causes gcloud Clients to ignore whatever
+Credentials objects you pass into them manually. If you need to use a
+custom set of credentials with `gcloud_requests` you must instantiate
+a `RequestsProxy` object by passing in those credentials and then
+passing that instance to your client like so:
+
+``` python
+from gcloud import storage
+from gcloud_requests.requests_connection import RequestsProxy
+
+http = RequestsProxy(custom_credentials)
+client = storage.Client(http=http)
+```
+
+For Datastore you should use `DatastoreRequestsProxy` instead:
+
+``` python
+from gcloud import datastore
+from gcloud_requests.requests_connection import DatastoreRequestsProxy
+
+http = DatastoreRequestsProxy(custom_credentials)
+client = datastore.Client(http=http)
+```
 
 ## Background
 
