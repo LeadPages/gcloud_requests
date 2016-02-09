@@ -3,7 +3,7 @@ python:
   - "2.7"
 before_install:
   - openssl aes-256-cbc -K $encrypted_84a2848b3b48_key -iv $encrypted_84a2848b3b48_iv -in tests/travisci-gcloud_requests.json.enc -out travisci-gcloud_requests.json -d
-  - export JSON_CREDENTIALS_FILE=travisci-gcloud_requests.json
+  - export GOOGLE_APPLICATION_CREDENTIALS=travisci-gcloud_requests.json
   - export DATASTORE_HOST=http://localhost:8080
   - export DATASTORE_DATASET=gcloud
   - mkdir ./datastore
