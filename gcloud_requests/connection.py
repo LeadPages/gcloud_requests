@@ -1,6 +1,6 @@
-import logging
 import gcloud.credentials
 
+from . import logger
 from .requests_connection import (
     BigQueryConnection,
     DatastoreConnection,
@@ -21,5 +21,7 @@ storage_connection = StorageConnection(credentials=credentials)
 try:
     resource_manager_connection = ResourceManagerConnection(credentials=credentials)
 except TypeError:
-    logging.debug("Resource manager connection unavailable (cannot be used " \
-                  "with service account credentials)")
+    logger.warning(
+        "Resource manager connection unavailable (cannot be used "
+        "with service account credentials)"
+    )

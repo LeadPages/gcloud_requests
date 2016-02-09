@@ -1,4 +1,3 @@
-import logging
 import requests
 import time
 
@@ -11,7 +10,8 @@ from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.resource_manager.connection import Connection as GCloudResourceManagerConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
 
-logger = logging.getLogger(__file__)
+from . import logger
+
 _state = local()
 
 
