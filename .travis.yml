@@ -3,16 +3,14 @@ python:
   - "2.7"
 before_install:
   - openssl aes-256-cbc -K $encrypted_84a2848b3b48_key -iv $encrypted_84a2848b3b48_iv -in tests/travisci-gcloud_requests.json.enc -out travisci-gcloud_requests.json -d
+  - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-103.0.0-linux-x86_64.tar.gz -O /tmp/gcloud.tar.gz
+  - tar -xvf /tmp/gcloud.tar.gz
+  - export PATH=$PATH:$PWD/google-cloud-sdk/bin
   - export GOOGLE_APPLICATION_CREDENTIALS=travisci-gcloud_requests.json
-  - export DATASTORE_HOST=http://localhost:8080
-  - export DATASTORE_DATASET=gcloud
   - mkdir ./datastore
-  - curl -o gcd.zip http://storage.googleapis.com/gcd/tools/$GCD_VERSION.zip
-  - unzip gcd.zip
-  - ./$GCD_VERSION/gcd.sh create -d gcloud ./datastore
-  - ./$GCD_VERSION/gcd.sh start --port=8080 ./datastore &
+  - gcloud -q beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud &
 install: "pip install -r requirements.txt"
-script: "env PYTHONPATH=. python tests/test_datastore.py"
+script: "env PYTHONPATH=. DATASTORE_HOST=http://localhost:8080/datastore DATASTORE_DATASET=gcloud python tests/test_datastore.py"
 addons:
   code_climate:
     repo_token: 1ae0e51788ad23c845e353566a8b245c4c2929035709105e2b8407d6ae2e2b51
