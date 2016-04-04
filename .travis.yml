@@ -3,10 +3,9 @@ python:
   - "2.7"
 before_install:
   - openssl aes-256-cbc -K $encrypted_84a2848b3b48_key -iv $encrypted_84a2848b3b48_iv -in tests/travisci-gcloud_requests.json.enc -out travisci-gcloud_requests.json -d
-  - curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-  - echo "deb http://packages.cloud.google.com/apt precise main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-  - sudo apt-get update -qq
-  - sudo apt-get install -y google-cloud-sdk
+  - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-103.0.0-linux-x86_64.tar.gz -O /tmp/gcloud.tar.gz
+  - tar -xvf /tmp/gcloud.tar.gz
+  - export PATH=$PATH:$PWD/google-cloud-sdk/bin
   - export GOOGLE_APPLICATION_CREDENTIALS=travisci-gcloud_requests.json
   - mkdir ./datastore
   - gcloud beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud
