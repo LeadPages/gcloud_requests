@@ -1,9 +1,9 @@
 # gcloud_requests
 
-[![GitHub license](https://img.shields.io/github/license/LeadPages/gcloud_requests.svg?style=flat-square)](https://raw.githubusercontent.com/LeadPages/gcloud_requests/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/leadpages/gcloud_requests.svg?style=flat-square)](https://raw.githubusercontent.com/leadpages/gcloud_requests/master/LICENSE)
 [![PyPI Version](https://img.shields.io/pypi/v/gcloud_requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
-[![Build Status](https://img.shields.io/travis/LeadPages/gcloud_requests.svg?style=flat-square)](https://travis-ci.org/LeadPages/gcloud_requests)
-[![Code Climate](https://img.shields.io/codeclimate/github/LeadPages/gcloud_requests.svg?style=flat-square)](https://codeclimate.com/github/LeadPages/gcloud_requests)
+[![Build Status](https://img.shields.io/travis/leadpages/gcloud_requests.svg?style=flat-square)](https://travis-ci.org/leadpages/gcloud_requests)
+[![Code Climate](https://img.shields.io/codeclimate/github/leadpages/gcloud_requests.svg?style=flat-square)](https://codeclimate.com/github/leadpages/gcloud_requests)
 [![PyPI Popularity](https://img.shields.io/pypi/dm/gcloud_requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
 
 Thread-safe client functionality for gcloud-python via requests.
@@ -80,7 +80,7 @@ then simply install `pytest` and run the tests with `py.test`.
 
 ## Authors
 
-`gcloud_requests` was authored at [LeadPages][leadpages]. You can
+`gcloud_requests` was authored at [Leadpages][leadpages]. You can
 find out more about contributors [here][contributors]. We welcome
 contributions, and [we're always looking][careers] for more
 engineering talent!
@@ -91,7 +91,7 @@ Please read [our contributor's guide](./CONTRIBUTING.md).
 
 [leadpages]: http://leadpages.net
 [careers]: http://www.leadpages.net/careers
-[contributors]: https://github.com/LeadPages/gcloud_requests/graphs/contributors
+[contributors]: https://github.com/leadpages/gcloud_requests/graphs/contributors
 [gcd]: https://cloud.google.com/datastore/docs/tools/
 [gcloud-python]: https://github.com/GoogleCloudPlatform/gcloud-python
 [requests]: http://python-requests.org

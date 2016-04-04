@@ -7,10 +7,10 @@ setup(
     description="Thread-safe client functionality for gcloud-python via requests.",
     long_description="""For documentation and usage examples, see the project on GitHub_.
 
-    .. _GitHub: https://github.com/LeadPages/gcloud_requests""",
+    .. _GitHub: https://github.com/leadpages/gcloud_requests""",
     version=__version__,
-    url="https://github.com/LeadPages/gcloud_requests",
-    author="LeadPages",
+    url="https://github.com/leadpages/gcloud_requests",
+    author="Leadpages",
     author_email="opensource@leadpages.net",
     license="MIT",
     packages=["gcloud_requests"],
