@@ -5,6 +5,7 @@ from datetime import datetime
 from gcloud.bigquery.connection import Connection as GCloudBigQueryConnection
 from gcloud.datastore.connection import Connection as GCloudDatastoreConnection
 from gcloud.dns.connection import Connection as GCloudDNSConnection
+from gcloud.logging.connection import Connection as GCloudLoggingConnection
 from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
 from threading import local
@@ -190,6 +191,10 @@ class DatastoreRequestsProxy(RequestsProxy):
 
 class DNSRequestsProxy(RequestsProxy):
     SCOPE = GCloudDNSConnection.SCOPE
+
+
+class LoggingRequestsProxy(RequestsProxy):
+    SCOPE = GCloudLoggingConnection.SCOPE
 
 
 class PubSubRequestsProxy(RequestsProxy):
