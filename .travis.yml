@@ -8,7 +8,7 @@ before_install:
   - export PATH=$PATH:$PWD/google-cloud-sdk/bin
   - export GOOGLE_APPLICATION_CREDENTIALS=travisci-gcloud_requests.json
   - mkdir ./datastore
-  - gcloud -q beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud
+  - gcloud -q beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud &
 install: "pip install -r requirements.txt"
 script: "env PYTHONPATH=. DATASTORE_HOST=http://localhost:8080/datastore DATASTORE_DATASET=gcloud python tests/test_datastore.py"
 addons:
