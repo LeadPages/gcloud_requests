@@ -149,6 +149,14 @@ class DatastoreRequestsProxy(RequestsProxy):
 
     SCOPE = GCloudDatastoreConnection.SCOPE
 
+    # A mapping from Datastore error states that can be retried to the
+    # maximum number of times each one should be retried.
+    _MAX_RETRIES = {
+        "INTERNAL": 1,
+        "UNAVAILABLE": 5,
+        "DEADLINE_EXCEEDED": 5,
+    }
+
     def _handle_response_error(self, response, retries, **kwargs):
         """Handles Datastore response errors according to their documentation.
 
@@ -165,28 +173,27 @@ class DatastoreRequestsProxy(RequestsProxy):
         .. [#] https://cloud.google.com/datastore/docs/concepts/errors
         """
         content_type = response.headers.get("content-type", "")
-        if "application/json" in content_type:
-            json = response.json()
-            reasons = [error["reason"] for error in json["errors"]]
-            if "INVALID_ARGUMENT" in reasons or \
-               "PERMISSION_DENIED" in reasons or \
-               "RESOURCE_EXHAUSTED" in reasons or \
-               "FAILED_PRECONDITION" in reasons:
-                return response
+        if "application/json" not in content_type:
+            logger.warning("Unexpected response from datastore: %r", response.text)
+            return response
 
-        if response.status_code == 500 and retries < 1 or \
-           response.status_code == 503 and retries < 5 or \
-           response.status_code == 403 and retries < 5 or \
-           response.status_code == 409 and retries < 3:
-            backoff = min(0.0625 * 2 ** retries, 1.0)
-            logger.debug("Sleeping for %r before retrying failed request...", backoff)
-            time.sleep(backoff)
+        data = response.json()
+        status = data.get("error", {}).get("status")
+        if status is None:
+            logger.warning("Unexpected error response from datastore: %r", data)
+            return response
 
-            logger.debug("Retrying failed request...")
-            response_proxy, _ = self._retry(retries=retries + 1, **kwargs)
-            return response_proxy.response
+        max_retries = self._MAX_RETRIES.get(status)
+        if max_retries is None or retries >= max_retries:
+            return response
 
-        return response
+        backoff = min(0.0625 * 2 ** retries, 1.0)
+        logger.debug("Sleeping for %r before retrying failed request...", backoff)
+        time.sleep(backoff)
+
+        logger.debug("Retrying failed request...")
+        response_proxy, _ = self._retry(retries=retries + 1, **kwargs)
+        return response_proxy.response
 
 
 class DNSRequestsProxy(RequestsProxy):
