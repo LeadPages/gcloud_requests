@@ -178,11 +178,12 @@ class DatastoreRequestsProxy(RequestsProxy):
             return response
 
         data = response.json()
-        status = data.get("error", {}).get("status")
-        if status is None:
+        error = data.get("error")
+        if not error or not isinstance(error, dict):
             logger.warning("Unexpected error response from datastore: %r", data)
             return response
 
+        status = error.get("status")
         max_retries = self._MAX_RETRIES.get(status)
         if max_retries is None or retries >= max_retries:
             return response
