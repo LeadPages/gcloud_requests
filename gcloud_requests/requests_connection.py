@@ -8,6 +8,7 @@ from gcloud.dns.connection import Connection as GCloudDNSConnection
 from gcloud.logging.connection import Connection as GCloudLoggingConnection
 from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
+from google.rpc import status_pb2
 from threading import local
 
 from . import logger
@@ -149,6 +150,14 @@ class DatastoreRequestsProxy(RequestsProxy):
 
     SCOPE = GCloudDatastoreConnection.SCOPE
 
+    # A mapping from numeric Google RPC error codes to known error
+    # code strings.
+    _PB_ERROR_CODES = {
+        4: "DEADLINE_EXCEEDED",
+        13: "INTERNAL",
+        14: "UNAVAILABLE",
+    }
+
     # A mapping from Datastore error states that can be retried to the
     # maximum number of times each one should be retried.
     _MAX_RETRIES = {
@@ -173,14 +182,22 @@ class DatastoreRequestsProxy(RequestsProxy):
         .. [#] https://cloud.google.com/datastore/docs/concepts/errors
         """
         content_type = response.headers.get("content-type", "")
-        if "application/json" not in content_type:
-            logger.warning("Unexpected response from datastore: %r", response.text)
-            return response
+        if "application/x-protobuf" in content_type:
+            logger.debug("Decoding protobuf response.")
+            data = status_pb2.Status.FromString(response.content)
+            status = self._PB_ERROR_CODES.get(data.code)
+            error = {"status": status}
 
-        data = response.json()
-        error = data.get("error")
-        if not error or not isinstance(error, dict):
-            logger.warning("Unexpected error response from datastore: %r", data)
+        elif "application/json" in content_type:
+            logger.debug("Decoding json response.")
+            data = response.json()
+            error = data.get("error")
+            if not error or not isinstance(error, dict):
+                logger.warning("Unexpected error response from datastore: %r", data)
+                return response
+
+        else:
+            logger.warning("Unexpected response from datastore: %r", response.text)
             return response
 
         status = error.get("status")
