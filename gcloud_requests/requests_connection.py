@@ -42,7 +42,7 @@ class RequestsProxy(object):
         # credentials.
         if credentials.create_scoped_required():
             credentials = credentials.create_scoped(cls.SCOPE)
-        instance = super(RequestsProxy, cls).__new__(cls, credentials)
+        instance = super(RequestsProxy, cls).__new__(cls)
         return credentials.authorize(instance)
 
     def __init__(self, credentials):
