@@ -7,7 +7,7 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_84a2848b3b48_key -iv $encrypted_84a2848b3b48_iv -in tests/travisci-gcloud_requests.json.enc -out travisci-gcloud_requests.json -d
   - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-103.0.0-linux-x86_64.tar.gz -O /tmp/gcloud.tar.gz
   - tar -xvf /tmp/gcloud.tar.gz -C $HOME
-  - export PATH=$PATH:$HOME/google-cloud-sdk/bin
+  - export PATH=$HOME/google-cloud-sdk/bin:$PATH
   - export GOOGLE_APPLICATION_CREDENTIALS=travisci-gcloud_requests.json
   - gcloud -q components install beta gcd-emulator
   - mkdir ./datastore
