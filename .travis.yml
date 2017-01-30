@@ -11,9 +11,9 @@ before_install:
   - export GOOGLE_APPLICATION_CREDENTIALS="leadpages-8687295e9cc6.json"
   - gcloud -q components install beta gcd-emulator
   - mkdir ./datastore
-  - gcloud -q beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud &
+  - gcloud -q beta emulators datastore start --data-dir=./datastore --consistency 1.0 --host-port localhost:8080 --project=gcloud --legacy &
 install: "pip install -U -r requirements.txt"
-script: "env PYTHONPATH=. DATASTORE_HOST=http://localhost:8080 DATASTORE_DATASET=gcloud python tests/test_datastore.py"
+script: "env PYTHONPATH=. DATASTORE_HOST='http://localhost:8080' DATASTORE_DATASET=gcloud python tests/test_datastore.py"
 addons:
   code_climate:
     repo_token: 1ae0e51788ad23c845e353566a8b245c4c2929035709105e2b8407d6ae2e2b51
