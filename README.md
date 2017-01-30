@@ -14,7 +14,7 @@ Thread-safe client functionality for gcloud-python via requests.
 pip install --upgrade gcloud_requests
 ```
 
-**Note** that at this time, only `gcloud==0.17.0` on Python 2.7 is
+**Note** that at this time, only `gcloud==0.18.1` on Python 2.7 is
 officially supported.
 
 ## Usage
