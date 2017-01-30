@@ -10,6 +10,7 @@ from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
 from google.rpc import status_pb2
 from threading import local
+from urllib3 import Retry
 
 from . import logger
 
@@ -63,8 +64,11 @@ class RequestsProxy(object):
         # socket errors, etc.
         session = getattr(_state, "session", None)
         if session is None:
+            retry_config = Retry(5, read=True)
             session = _state.session = requests.Session()
-            adapter = _state.adapter = requests.adapters.HTTPAdapter(max_retries=5)
+            adapter = _state.adapter = requests.adapters.HTTPAdapter(
+                max_retries=retry_config
+            )
             session.mount("http://", adapter)
             session.mount("https://", adapter)
 
