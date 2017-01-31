@@ -9,8 +9,8 @@ from gcloud.logging.connection import Connection as GCloudLoggingConnection
 from gcloud.pubsub.connection import Connection as GCloudPubSubConnection
 from gcloud.storage.connection import Connection as GCloudStorageConnection
 from google.rpc import status_pb2
+from requests.packages.urllib3 import Retry
 from threading import local
-from urllib3 import Retry
 
 from . import logger
 
