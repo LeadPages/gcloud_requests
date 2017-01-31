@@ -64,7 +64,7 @@ class RequestsProxy(object):
         # socket errors, etc.
         session = getattr(_state, "session", None)
         if session is None:
-            retry_config = Retry(5, read=5)
+            retry_config = Retry(total=10, connect=10, read=5)
             session = _state.session = requests.Session()
             adapter = _state.adapter = requests.adapters.HTTPAdapter(
                 max_retries=retry_config
