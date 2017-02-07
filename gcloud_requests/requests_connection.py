@@ -36,6 +36,7 @@ class RequestsProxy(object):
     """
 
     SCOPE = None
+    METHOD_WHITELIST = Retry.DEFAULT_METHOD_WHITELIST | frozenset(["POST"])
 
     def __new__(cls, credentials):
         # We want to both pass in the credentials to the instance and
@@ -64,7 +65,12 @@ class RequestsProxy(object):
         # socket errors, etc.
         session = getattr(_state, "session", None)
         if session is None:
-            retry_config = Retry(total=10, connect=10, read=5)
+            retry_config = Retry(
+                total=10,
+                connect=10,
+                read=5,
+                method_whitelist=self.METHOD_WHITELIST
+            )
             session = _state.session = requests.Session()
             adapter = _state.adapter = requests.adapters.HTTPAdapter(
                 max_retries=retry_config
