@@ -83,9 +83,8 @@ class RequestsProxy(object):
             method, uri, data=body, headers=headers,
             allow_redirects=redirections > 0,
             # NOTE: The connect timeout is set to 3.05 based on a
-            # recommendation in requests' docs and the read timeout is
-            # arbitrary.
-            timeout=(3.05, 7)
+            # recommendation in requests' docs
+            timeout=(3.05, None)
         )
         if response.status_code >= 400:
             response = self._handle_response_error(
