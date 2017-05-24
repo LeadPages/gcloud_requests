@@ -2,5 +2,6 @@
 /.coverage
 /build
 /dist
+/gcloud_requests.egg-info
 /htmlcov
 *.pyc
