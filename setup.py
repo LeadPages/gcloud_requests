@@ -1,6 +1,26 @@
 from setuptools import setup
 
-from gcloud_requests import __version__
+with open("gcloud_requests/__init__.py", "r") as f:
+    version_marker = "__version__ = "
+    for line in f:
+        if line.startswith(version_marker):
+            _, version = line.split(version_marker)
+            version = version.strip().strip('"')
+            break
+    else:
+        raise RuntimeError("Version marker not found.")
+
+
+def parse_dependencies(filename):
+    with open(filename) as reqs:
+        for line in reqs:
+            if line.startswith("#"):
+                continue
+
+            yield line.strip()
+
+
+dependencies = list(parse_dependencies("requirements.txt"))
 
 setup(
     name="gcloud_requests",
@@ -8,15 +28,13 @@ setup(
     long_description="""For documentation and usage examples, see the project on GitHub_.
 
     .. _GitHub: https://github.com/leadpages/gcloud_requests""",
-    version=__version__,
+    version=version,
     url="https://github.com/leadpages/gcloud_requests",
     author="Leadpages",
     author_email="opensource@leadpages.net",
     license="MIT",
     packages=["gcloud_requests"],
-    install_requires=[
-        "requests>=2.9,<3"
-    ],
+    install_requires=dependencies,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

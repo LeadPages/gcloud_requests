@@ -1,38 +1,45 @@
 import logging
 import multiprocessing
 import time
+import pytest
 
-from gcloud import datastore
-from gcloud_requests.connection import datastore_http
+from concurrent.futures import ThreadPoolExecutor
+from google.cloud import datastore
+from gcloud_requests import DatastoreRequestsProxy
 
-from threading import Thread
+logging.basicConfig(level=logging.INFO)
 
-logging.basicConfig(level=logging.DEBUG)
-
-client = datastore.Client(http=datastore_http)
 ns = "gcloud-requests-{}".format(time.time())
-
-forms = client.query(kind="Form", namespace=ns).fetch()
-for form in forms:
-    client.delete(form.key)
-
-for i in range(250):
-    e = datastore.Entity(key=client.key("Form", namespace=ns))
-    e.update(x=i)
-    client.put(e)
+client = datastore.Client(_http=DatastoreRequestsProxy(), _use_grpc=False)
+workers = multiprocessing.cpu_count() * 2
 
 
-def r():
-    forms = client.query(kind="Form", namespace=ns).fetch()
-    for form in forms:
-        client.put(form)
+@pytest.fixture
+def forms():
+    logging.info("Populating dataset...")
+
+    def create(i):
+        e = datastore.Entity(key=client.key("Form", namespace=ns))
+        e.update(x=i)
+        client.put(e)
+        return e.key
+
+    with ThreadPoolExecutor(max_workers=workers) as e:
+        keys = list(e.map(create, xrange(250)))
+
+    logging.info("Yielding fixture...")
+    yield
+
+    logging.info("Cleaning up...")
+    with ThreadPoolExecutor(max_workers=workers) as e:
+        list(e.map(client.delete, keys))
 
 
-threads = []
-for i in range(multiprocessing.cpu_count()):
-    t = Thread(target=r)
-    t.start()
-    threads.append(t)
+def test_datastore_concurrency(forms):
+    def thrash(thread_id):
+        logging.info("Thrashing in thread %r.", thread_id)
+        for form in client.query(kind="Form", namespace=ns).fetch():
+            client.put(form)
 
-for t in threads:
-    t.join()
+    with ThreadPoolExecutor(max_workers=workers) as e:
+        list(e.map(thrash, xrange(workers)))

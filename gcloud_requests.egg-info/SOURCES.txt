@@ -1,0 +1,10 @@
+setup.cfg
+setup.py
+gcloud_requests/__init__.py
+gcloud_requests/connection.py
+gcloud_requests/requests_connection.py
+gcloud_requests.egg-info/PKG-INFO
+gcloud_requests.egg-info/SOURCES.txt
+gcloud_requests.egg-info/dependency_links.txt
+gcloud_requests.egg-info/requires.txt
+gcloud_requests.egg-info/top_level.txt

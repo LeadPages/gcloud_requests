@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: gcloud-requests
+Version: 0.14.0
+Summary: Thread-safe client functionality for gcloud-python via requests.
+Home-page: https://github.com/leadpages/gcloud_requests
+Author: Leadpages
+Author-email: opensource@leadpages.net
+License: MIT
+Description: For documentation and usage examples, see the project on GitHub_.
+        
+            .. _GitHub: https://github.com/leadpages/gcloud_requests
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
