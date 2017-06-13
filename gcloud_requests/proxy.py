@@ -36,7 +36,7 @@ class RequestsProxy(object):
 
     #: Determines how connection and read timeouts should be handled
     #: by this proxy.
-    TIMEOUT_CONFIG = (3.05, 7)
+    TIMEOUT_CONFIG = (3.05, 30)
 
     #: Determines how retries should be handled by this proxy.
     RETRY_CONFIG = Retry(
