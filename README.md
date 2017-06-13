@@ -4,7 +4,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/gcloud_requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
 [![Build Status](https://img.shields.io/travis/LeadPages/gcloud_requests.svg?style=flat-square)](https://travis-ci.org/LeadPages/gcloud_requests)
 [![Code Climate](https://img.shields.io/codeclimate/github/LeadPages/gcloud_requests.svg?style=flat-square)](https://codeclimate.com/github/LeadPages/gcloud_requests)
-[![PyPI Popularity](https://img.shields.io/pypi/dm/gcloud_requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
+[![PyPI Popularity](https://img.shields.io/pypi/dm/gcloud-requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
 
 Thread-safe client functionality for `google-cloud-{datastore,storage}` via requests.
 
@@ -14,8 +14,8 @@ Thread-safe client functionality for `google-cloud-{datastore,storage}` via requ
 pip install --upgrade gcloud_requests
 ```
 
-**Note** that at this time, only `google-cloud-datastore==1.0.0` on
-Python 2.7 is officially supported.
+**Note** that at this time, only `google-cloud-datastore==1.0.0` is
+officially supported.
 
 ## Usage
 
