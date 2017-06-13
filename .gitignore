@@ -1,7 +1,9 @@
+*.py[co]
+__pycache__
 /.cache
 /.coverage
+/.tox
 /build
 /dist
 /gcloud_requests.egg-info
 /htmlcov
-*.pyc

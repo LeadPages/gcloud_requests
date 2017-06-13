@@ -1,11 +1,12 @@
 import logging
 import multiprocessing
-import time
 import pytest
+import time
 
 from concurrent.futures import ThreadPoolExecutor
 from google.cloud import datastore
 from gcloud_requests import DatastoreRequestsProxy
+from six.moves import xrange
 
 logging.basicConfig(level=logging.INFO)
 

@@ -8,6 +8,7 @@ google-cloud-storage>=1.1.1,<2
 futures
 pytest>=3
 pytest-cov
+tox
 
 # Misc
 bumpversion
