@@ -1,10 +1,9 @@
 # gcloud_requests
 
-[![GitHub license](https://img.shields.io/github/license/leadpages/gcloud_requests.svg?style=flat-square)](https://raw.githubusercontent.com/leadpages/gcloud_requests/master/LICENSE)
-[![PyPI Version](https://img.shields.io/pypi/v/gcloud_requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
-[![Build Status](https://img.shields.io/travis/LeadPages/gcloud_requests.svg?style=flat-square)](https://travis-ci.org/LeadPages/gcloud_requests)
-[![Code Climate](https://img.shields.io/codeclimate/github/LeadPages/gcloud_requests.svg?style=flat-square)](https://codeclimate.com/github/LeadPages/gcloud_requests)
-[![PyPI Popularity](https://img.shields.io/pypi/dm/gcloud-requests.svg?style=flat-square)](https://pypi.python.org/pypi/gcloud_requests/)
+[![GitHub license](https://img.shields.io/github/license/leadpages/gcloud_requests.svg)](https://raw.githubusercontent.com/leadpages/gcloud_requests/master/LICENSE)
+[![PyPI Version](https://img.shields.io/pypi/v/gcloud_requests.svg)](https://pypi.python.org/pypi/gcloud_requests/)
+[![Build Status](https://img.shields.io/travis/LeadPages/gcloud_requests.svg)](https://travis-ci.org/LeadPages/gcloud_requests)
+[![Code Climate](https://img.shields.io/codeclimate/github/LeadPages/gcloud_requests.svg)](https://codeclimate.com/github/LeadPages/gcloud_requests)
 
 Thread-safe client functionality for `google-cloud-{datastore,storage}` via requests.
 
