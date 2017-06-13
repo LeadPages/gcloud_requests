@@ -14,11 +14,12 @@ before_install:
   - export PATH=$HOME/google-cloud-sdk/bin:$PATH
   - export GOOGLE_APPLICATION_CREDENTIALS="leadpages-8687295e9cc6.json"
   - gcloud -q components install beta gcd-emulator
-  - gcloud -q beta emulators datastore start --no-store-on-disk --consistency 1.0 --host-port localhost:8080 --project=gcloud &
+  - gcloud -q beta emulators datastore start --no-store-on-disk --consistency 1.0 &
+  - sleep 15 && source $(gcloud beta emulators datastore env-init)
 install:
   - pip install tox-travis
 script:
-  - "env PYTHONPATH=. DATASTORE_EMULATOR_HOST=localhost:8080 DATASTORE_DATASET=gcloud tox"
+  - tox
 addons:
   code_climate:
     repo_token: 1ae0e51788ad23c845e353566a8b245c4c2929035709105e2b8407d6ae2e2b51
