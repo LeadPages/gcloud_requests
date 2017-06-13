@@ -15,7 +15,7 @@ before_install:
   - export GOOGLE_APPLICATION_CREDENTIALS="leadpages-8687295e9cc6.json"
   - gcloud -q components install beta gcd-emulator
   - gcloud -q beta emulators datastore start --no-store-on-disk --consistency 1.0 &
-  - sleep 15 && source $(gcloud beta emulators datastore env-init)
+  - sleep 15 && eval $(gcloud beta emulators datastore env-init)
 install:
   - pip install tox-travis
 script:
