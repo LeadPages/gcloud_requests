@@ -134,23 +134,8 @@ class RequestsProxy(object):
         Returns:
           requests.Response
         """
-        content_type = response.headers.get("content-type", "")
-        if "application/x-protobuf" in content_type:
-            self.logger.debug("Decoding protobuf response.")
-            data = status_pb2.Status.FromString(response.content)
-            status = self._PB_ERROR_CODES.get(data.code)
-            error = {"status": status}
-
-        elif "application/json" in content_type:
-            self.logger.debug("Decoding json response.")
-            data = response.json()
-            error = data.get("error")
-            if not error or not isinstance(error, dict):
-                self.logger.warning("Unexpected error response: %r", data)
-                return response
-
-        else:
-            self.logger.warning("Unexpected response: %r", response.text)
+        error = self._convert_response_to_error(response)
+        if error is None:
             return response
 
         max_retries = self._max_retries_for_error(error)
@@ -165,6 +150,37 @@ class RequestsProxy(object):
         self.logger.warning("Retrying failed request. Attempt %d/%d.", retries, max_retries)
         response_proxy, _ = self.request(retries=retries, **kwargs)
         return response_proxy.response
+
+    def _convert_response_to_error(self, response):
+        """Subclasses may override this method in order to influence
+        how errors are parsed from the response.
+
+        Parameters:
+          response(Response): The response object.
+
+        Returns:
+          object or None: Any object for which a max retry count can
+          be retrieved or None if the error cannot be handled.
+        """
+        content_type = response.headers.get("content-type", "")
+        if "application/x-protobuf" in content_type:
+            self.logger.debug("Decoding protobuf response.")
+            data = status_pb2.Status.FromString(response.content)
+            status = self._PB_ERROR_CODES.get(data.code)
+            error = {"status": status}
+            return error
+
+        elif "application/json" in content_type:
+            self.logger.debug("Decoding json response.")
+            data = response.json()
+            error = data.get("error")
+            if not error or not isinstance(error, dict):
+                self.logger.warning("Unexpected error response: %r", data)
+                return None
+            return error
+
+        self.logger.warning("Unexpected response: %r", response.text)
+        return None
 
     def _max_retries_for_error(self, error):
         """Subclasses may implement this method in order to influence

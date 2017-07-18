@@ -28,6 +28,13 @@ class CloudStorageRequestsProxy(RequestsProxy):
         503: 5,
     }
 
+    def _convert_response_to_error(self, response):
+        # Sometimes GCS 503s with no content so we handle that case here.
+        if response.status_code == 503 and not response.text:
+            return {"code": 503}
+
+        return super(CloudStorageRequestsProxy, self)._convert_response_to_error(response)
+
     def _max_retries_for_error(self, error):
         """Handles Datastore response errors according to their documentation.
 

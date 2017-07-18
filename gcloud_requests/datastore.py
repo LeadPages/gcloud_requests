@@ -43,6 +43,16 @@ class DatastoreRequestsProxy(RequestsProxy):
         "DEADLINE_EXCEEDED": 5,
     }
 
+    def _convert_response_to_error(self, response):
+        content_type = response.headers.get("content-type", "")
+        if response.status_code == 502 and content_type.startswith("text/html"):
+            # The Datastore error handling docs don't mention anything
+            # about how 502s should be handled so we just handle them
+            # the same way we do 503s.
+            return {"status": "UNAVAILABLE"}
+
+        return super(DatastoreRequestsProxy, self)._convert_response_to_error(response)
+
     def _max_retries_for_error(self, error):
         """Handles Datastore response errors according to their documentation.
 
