@@ -64,12 +64,12 @@ class RequestsProxy(object):
 
         self.logger = logger or logging.getLogger(type(self).__name__)
         self.credentials = credentials
-        self.auth_request = AuthRequest(session=self._get_session())
 
     def request(self, uri, method="GET", body=None, headers=None, redirections=5, connection_type=None, retries=0, refresh_attempts=0):   # noqa
         session = self._get_session()
         headers = headers.copy() if headers is not None else {}
-        self.credentials.before_request(self.auth_request, method, uri, headers)
+        auth_request = AuthRequest(session=session)
+        self.credentials.before_request(auth_request, method, uri, headers)
 
         response = session.request(
             method, uri, data=body, headers=headers,
@@ -81,7 +81,7 @@ class RequestsProxy(object):
                 "Refreshing credentials due to a %s response. Attempt %s/%s.",
                 response.status_code, refresh_attempts + 1, _max_refresh_attempts
             )
-            self.credentials.refresh(self.auth_request)
+            self.credentials.refresh(auth_request)
             return self.request(
                 uri=uri, method=method,
                 body=body, headers=headers,
