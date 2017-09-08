@@ -148,3 +148,44 @@ def test_datastore_proxy_does_not_retry_aborted_statuses_while_in_transaction(da
             assert sum(calls) == 1
         finally:
             exit_transaction()
+
+
+def test_datastore_proxy_retries_token_refresh_errors(datastore_proxy):
+    # Given that I have a Datastore Proxy
+    # And I've mocked the requests library to cause a refresh to be attempted
+    downstream_calls = []
+
+    @urlmatch(netloc=".*example.com")
+    def downstream(netloc, request):
+        downstream_calls.append(1)
+        if sum(downstream_calls) == 1:
+            return {"status_code": 401}
+        return {
+            "status_code": 200,
+            "headers": {"content-type": "application/json"},
+            "content": "{}",
+        }
+
+    # And I've mocked the refresh endpoint so that it causes a
+    # RefreshError to be raised
+    refresh_calls = []
+
+    @urlmatch(netloc="accounts.google.com", path="/o/oauth2/token")
+    def refresh(netloc, request):
+        refresh_calls.append(1)
+        if sum(refresh_calls) == 1:
+            return {
+                "status_code": 500,
+                "headers": {"content-type": "text/html"},
+                "content": "<h1>Error</h1>",
+            }
+        # Pass through to the real impl.
+        return None
+
+    with HTTMock(downstream), HTTMock(refresh):
+        # If I make a request
+        response, body = datastore_proxy.request("http://example.com")
+
+        # I expect it to succeed
+        assert response["status"] == "200"
+        assert body == b"{}"

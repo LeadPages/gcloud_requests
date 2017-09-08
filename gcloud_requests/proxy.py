@@ -2,8 +2,10 @@ import logging
 import requests
 import time
 
+from functools import partial
 from google.rpc import status_pb2
 from google.auth.credentials import with_scopes_if_required
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request as AuthRequest
 from google.cloud.credentials import get_credentials
 from requests.packages.urllib3.util.retry import Retry
@@ -11,7 +13,7 @@ from threading import local
 
 _state = local()
 _refresh_status_codes = (401,)
-_max_refresh_attempts = 2
+_max_refresh_attempts = 5
 
 
 class ResponseProxy(requests.structures.CaseInsensitiveDict):
@@ -69,7 +71,22 @@ class RequestsProxy(object):
         session = self._get_session()
         headers = headers.copy() if headers is not None else {}
         auth_request = AuthRequest(session=session)
-        self.credentials.before_request(auth_request, method, uri, headers)
+        retry_auth = partial(
+            self.request,
+            uri=uri, method=method,
+            body=body, headers=headers,
+            redirections=redirections,
+            connection_type=connection_type,
+            refresh_attempts=refresh_attempts + 1,
+            retries=0,  # Retries intentionally get reset to 0.
+        )
+
+        try:
+            self.credentials.before_request(auth_request, method, uri, headers)
+        except RefreshError:
+            if refresh_attempts < _max_refresh_attempts:
+                return retry_auth()
+            raise
 
         response = session.request(
             method, uri, data=body, headers=headers,
@@ -81,15 +98,13 @@ class RequestsProxy(object):
                 "Refreshing credentials due to a %s response. Attempt %s/%s.",
                 response.status_code, refresh_attempts + 1, _max_refresh_attempts
             )
-            self.credentials.refresh(auth_request)
-            return self.request(
-                uri=uri, method=method,
-                body=body, headers=headers,
-                redirections=redirections,
-                connection_type=connection_type,
-                refresh_attempts=refresh_attempts + 1,
-                retries=0,  # Retries intentionally get reset to 0.
-            )
+
+            try:
+                self.credentials.refresh(auth_request)
+            except RefreshError:
+                pass
+
+            return retry_auth()
 
         elif response.status_code >= 400:
             response = self._handle_response_error(
