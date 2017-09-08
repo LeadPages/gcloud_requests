@@ -11,6 +11,8 @@ from google.cloud.credentials import get_credentials
 from requests.packages.urllib3.util.retry import Retry
 from threading import local
 
+from .credentials_watcher import CredentialsWatcher
+
 _state = local()
 _refresh_status_codes = (401,)
 _max_refresh_attempts = 5
@@ -59,13 +61,16 @@ class RequestsProxy(object):
         14: "UNAVAILABLE",
     }
 
-    def __init__(self, credentials=None, logger=None):
+    def __init__(self, credentials=None, logger=None, watcher=True):
         if credentials is None:
             credentials = get_credentials()
             credentials = with_scopes_if_required(credentials, self.SCOPE)
 
         self.logger = logger or logging.getLogger(type(self).__name__)
         self.credentials = credentials
+
+        if watcher:
+            self.credentials_watcher = CredentialsWatcher(credentials)
 
     def request(self, uri, method="GET", body=None, headers=None, redirections=5, connection_type=None, retries=0, refresh_attempts=0):   # noqa
         session = self._get_session()
