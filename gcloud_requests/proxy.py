@@ -71,6 +71,9 @@ class RequestsProxy(object):
         self.credentials = credentials
         _credentials_watcher.watch(credentials)
 
+    def __del__(self):
+        _credentials_watcher.unwatch(self.credentials)
+
     def request(self, uri, method="GET", body=None, headers=None, redirections=5, connection_type=None, retries=0, refresh_attempts=0):   # noqa
         session = self._get_session()
         headers = headers.copy() if headers is not None else {}

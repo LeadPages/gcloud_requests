@@ -62,3 +62,8 @@ class CredentialsWatcher(Thread):
         with self.watch_list_updated:
             self.watch_list.append(credentials)
             self.watch_list_updated.notify()
+
+    def unwatch(self, credentials):
+        with self.watch_list_updated:
+            self.watch_list.remove(credentials)
+            self.watch_list_updated.notify()
