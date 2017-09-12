@@ -130,3 +130,20 @@ def test_credentials_watcher_is_resilient_to_coding_errors():
     assert credentials_2.refresh_calls == 0
     # And the second to have been removed from the watch list
     assert credentials_2 not in watcher.watch_list
+
+
+def test_credentials_watcher_can_be_stopped():
+    # Given that I have a credentials watcher
+    watcher = CredentialsWatcher()
+
+    # And a stub credentials object that needs to be refreshed once an hour
+    credentials = StubCredentials(refresh_every=3600)
+
+    # If I watch that object
+    watcher.watch(credentials)
+
+    # Then stop the watcher
+    watcher.stop()
+
+    # I expect it to stop
+    assert not watcher.running
