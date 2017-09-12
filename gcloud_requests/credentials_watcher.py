@@ -23,9 +23,20 @@ class CredentialsWatcher(Thread):
         self.logger = logging.getLogger("gcloud_requests.CredentialsWatcher")
         self.start()
 
-    def run(self):
+    def stop(self):
+        self.logger.debug("Stopping watcher...")
         with self.watch_list_updated:
-            while True:
+            self.running = False
+            self.watch_list_updated.notify()
+
+        self.logger.debug("Joining on watcher...")
+        self.join()
+        self.logger.debug("Watcher successfully stopped.")
+
+    def run(self):
+        self.running = True
+        with self.watch_list_updated:
+            while self.running:
                 self.logger.debug("Ticking...")
                 wait_time = self.tick()
 

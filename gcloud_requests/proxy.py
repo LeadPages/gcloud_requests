@@ -1,3 +1,4 @@
+import atexit
 import logging
 import requests
 import time
@@ -17,6 +18,7 @@ _state = local()
 _refresh_status_codes = (401,)
 _max_refresh_attempts = 5
 _credentials_watcher = CredentialsWatcher()
+atexit.register(_credentials_watcher.stop)
 
 
 class ResponseProxy(requests.structures.CaseInsensitiveDict):
