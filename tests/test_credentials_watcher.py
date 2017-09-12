@@ -38,6 +38,10 @@ class BrokenCredentials(StubCredentials):
         super(BrokenCredentials, self).__init__(refresh_every)
         self.expiry = time.time()
 
+    @property
+    def valid(self):
+        return True
+
     def refresh(self, request):
         raise RuntimeError("some coding error")
 
