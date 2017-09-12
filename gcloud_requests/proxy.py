@@ -62,7 +62,7 @@ class RequestsProxy(object):
         14: "UNAVAILABLE",
     }
 
-    def __init__(self, credentials=None, logger=None, watcher=True):
+    def __init__(self, credentials=None, logger=None):
         if credentials is None:
             credentials = get_credentials()
             credentials = with_scopes_if_required(credentials, self.SCOPE)
