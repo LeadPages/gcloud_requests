@@ -1,4 +1,4 @@
 google-auth>=1.0.1,<2.0
-google-cloud-core>=0.29.1,<0.30
+google-cloud-core>=0.25,<0.30dev
 requests>=2.9,<3
 six>=1.10.0,<2.0
