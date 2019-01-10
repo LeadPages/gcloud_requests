@@ -22,22 +22,9 @@ _credentials_watcher = CredentialsWatcher()
 atexit.register(_credentials_watcher.stop)
 
 
-class ResponseProxy(requests.structures.CaseInsensitiveDict):
-    def __init__(self, response):
-        super(ResponseProxy, self).__init__()
-        self.response = response
-        self.update(response.headers)
-        self.update(status=str(self.status))
-
-    @property
-    def status(self):
-        return self.response.status_code
-
-
 class RequestsProxy(object):
     """Wraps a ``requests`` library :class:`.Session` instance and
-    exposes a `request` method that is compatible with the
-    ``httplib2`` `request` method.
+    exposes a compatible `request` method.
     """
 
     SCOPE = None
@@ -77,31 +64,30 @@ class RequestsProxy(object):
     def __del__(self):
         _credentials_watcher.unwatch(self.credentials)
 
-    def request(self, uri, method="GET", body=None, headers=None, redirections=5, connection_type=None, retries=0, refresh_attempts=0):   # noqa
+    def request(self, method, url, data=None, headers=None, retries=0, refresh_attempts=0, **kwargs):
         session = self._get_session()
         headers = headers.copy() if headers is not None else {}
         auth_request = AuthRequest(session=session)
         retry_auth = partial(
             self.request,
-            uri=uri, method=method,
-            body=body, headers=headers,
-            redirections=redirections,
-            connection_type=connection_type,
+            url=url, method=method,
+            data=data, headers=headers,
             refresh_attempts=refresh_attempts + 1,
             retries=0,  # Retries intentionally get reset to 0.
+            **kwargs
         )
 
         try:
-            self.credentials.before_request(auth_request, method, uri, headers)
+            self.credentials.before_request(auth_request, method, url, headers)
         except RefreshError:
             if refresh_attempts < _max_refresh_attempts:
                 return retry_auth()
             raise
 
         response = session.request(
-            method, uri, data=body, headers=headers,
-            allow_redirects=redirections > 0,
+            method, url, data=data, headers=headers,
             timeout=self.TIMEOUT_CONFIG,
+            **kwargs
         )
         if response.status_code in _refresh_status_codes and refresh_attempts < _max_refresh_attempts:
             self.logger.info(
@@ -119,13 +105,12 @@ class RequestsProxy(object):
         elif response.status_code >= 400:
             response = self._handle_response_error(
                 response, retries,
-                uri=uri, method=method,
-                body=body, headers=headers,
-                redirections=redirections,
-                connection_type=connection_type
+                url=url, method=method,
+                data=data, headers=headers,
+                **kwargs
             )
 
-        return ResponseProxy(response), response.content
+        return response
 
     def _get_session(self):
         # Ensure we use one connection-pooling session per thread and
@@ -145,7 +130,7 @@ class RequestsProxy(object):
         return session
 
     def _handle_response_error(self, response, retries, **kwargs):
-        """Provides a way for each connection wrapper to handle error
+        r"""Provides a way for each connection wrapper to handle error
         responses.
 
         Parameters:
@@ -173,8 +158,8 @@ class RequestsProxy(object):
 
         retries += 1
         self.logger.warning("Retrying failed request. Attempt %d/%d.", retries, max_retries)
-        response_proxy, _ = self.request(retries=retries, **kwargs)
-        return response_proxy.response
+
+        return self.request(retries=retries, **kwargs)
 
     def _convert_response_to_error(self, response):
         """Subclasses may override this method in order to influence
