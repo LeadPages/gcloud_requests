@@ -53,7 +53,7 @@ class RequestsProxy(object):
     )
 
     #: The number of connections to pool per Session.
-    CONNETION_POOL_SIZE = 32
+    CONNECTION_POOL_SIZE = 32
 
     # A mapping from numeric Google RPC error codes to known error
     # code strings.
@@ -137,8 +137,8 @@ class RequestsProxy(object):
             session = _state.session = requests.Session()
             adapter = _state.adapter = requests.adapters.HTTPAdapter(
                 max_retries=self.RETRY_CONFIG,
-                pool_connections=self.CONNETION_POOL_SIZE,
-                pool_maxsize=self.CONNETION_POOL_SIZE,
+                pool_connections=self.CONNECTION_POOL_SIZE,
+                pool_maxsize=self.CONNECTION_POOL_SIZE,
             )
             session.mount("http://", adapter)
             session.mount("https://", adapter)
