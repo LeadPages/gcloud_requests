@@ -3,12 +3,13 @@ import logging
 import requests
 import time
 
+import google.auth
+
 from functools import partial
 from google.rpc import status_pb2
 from google.auth.credentials import with_scopes_if_required
 from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request as AuthRequest
-from google.cloud.credentials import get_credentials
 from requests.packages.urllib3.util.retry import Retry
 from threading import local
 
@@ -66,7 +67,7 @@ class RequestsProxy(object):
 
     def __init__(self, credentials=None, logger=None):
         if credentials is None:
-            credentials = get_credentials()
+            credentials = google.auth.default()[0]
             credentials = with_scopes_if_required(credentials, self.SCOPE)
 
         self.logger = logger or logging.getLogger(type(self).__name__)
