@@ -1,8 +1,14 @@
 -r requirements.txt
 
 # Supported libs
-google-cloud-datastore>=1.1,<1.2
-google-cloud-storage>=1.1.1,<2
+# grpc is necessary for datastore.
+# Because we pull in google-cloud-core from requirements.txt without grpc
+# extras specified, when we install google-cloud-datastore, which has
+# google-api-core[grpc] specified, pip fails to see the missing extras
+# dependency.
+google-api-core[grpc]
+google-cloud-datastore>=1.6,<2.0
+google-cloud-storage>=1.1.1,<2.0
 
 # Testing
 futures

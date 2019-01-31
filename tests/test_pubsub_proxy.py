@@ -28,7 +28,7 @@ def test_pubsub_proxy_retries_retriable_json_errors(pubsub_proxy, error_data, ex
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = pubsub_proxy.request("http://example.com")
+        pubsub_proxy.request("GET", "http://example.com")
 
         # I expect the endpoint to have been called some number of times
         assert sum(calls) == expected_tries

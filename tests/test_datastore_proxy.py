@@ -37,7 +37,7 @@ def test_datastore_proxy_retries_retriable_json_errors(datastore_proxy, error_da
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = datastore_proxy.request("http://example.com")
+        datastore_proxy.request("GET", "http://example.com")
 
         # I expect the endpoint to have been called some number of times
         assert sum(calls) == expected_tries
@@ -67,7 +67,7 @@ def test_datastore_proxy_retries_retriable_protobuf_errors(datastore_proxy, erro
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = datastore_proxy.request("http://example.com")
+        datastore_proxy.request("GET", "http://example.com")
 
         # I expect the endpoint to have been called some number of times
         assert sum(calls) == expected_tries
@@ -90,7 +90,7 @@ def test_datastore_proxy_does_not_retry_invalid_json(datastore_proxy):
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = datastore_proxy.request("http://example.com")
+        datastore_proxy.request("GET", "http://example.com")
 
         # I expect the endpoint to have been called once
         assert sum(calls) == 1
@@ -112,10 +112,10 @@ def test_datastore_proxy_retries_on_502(datastore_proxy):
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = datastore_proxy.request("http://example.com")
+        response = datastore_proxy.request("GET", "http://example.com")
 
         # I expect to get back a 502
-        assert response.status == 502
+        assert response.status_code == 502
 
         # And the endpoint to have been called a total of 6 times
         assert sum(calls) == 6
@@ -142,7 +142,7 @@ def test_datastore_proxy_does_not_retry_aborted_statuses_while_in_transaction(da
 
         try:
             # Then make a request
-            response, _ = datastore_proxy.request("http://example.com")
+            datastore_proxy.request("GET", "http://example.com")
 
             # I expect the endpoint to only get called once
             assert sum(calls) == 1
@@ -184,8 +184,8 @@ def test_datastore_proxy_retries_token_refresh_errors(datastore_proxy):
 
     with HTTMock(downstream), HTTMock(refresh):
         # If I make a request
-        response, body = datastore_proxy.request("http://example.com")
+        response = datastore_proxy.request("GET", "http://example.com")
 
         # I expect it to succeed
-        assert response["status"] == "200"
-        assert body == b"{}"
+        assert response.status_code == 200
+        assert response.content == b"{}"

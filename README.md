@@ -13,9 +13,6 @@ Thread-safe client functionality for `google-cloud-{datastore,storage}` via requ
 pip install --upgrade gcloud_requests
 ```
 
-**Note** that at this time, only `google-cloud-datastore==1.0.0` is
-officially supported.
-
 ## Usage
 
 Google Cloud Datastore:

@@ -28,7 +28,10 @@ def test_storage_proxy_retries_retriable_json_errors(storage_proxy, code, expect
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = storage_proxy.request("http://example.com")
+        response = storage_proxy.request("GET", "http://example.com")
+
+        # I expect to get back a 500
+        assert response.status_code == 500
 
         # I expect the endpoint to have been called some number of times
         assert sum(calls) == expected_tries
@@ -51,10 +54,10 @@ def test_storage_proxy_retries_on_502(storage_proxy):
 
     with HTTMock(request_handler):
         # If I make a request
-        response, _ = storage_proxy.request("http://example.com")
+        response = storage_proxy.request("GET", "http://example.com")
 
         # I expect to get back a 502
-        assert response.status == 503
+        assert response.status_code == 503
 
         # And the endpoint to have been called a total of 6 times
         assert sum(calls) == 6
