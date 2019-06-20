@@ -29,7 +29,7 @@ Google Cloud Storage:
 
 ```python
 from google.cloud import storage
-from gcloud_requests import DatastoreRequestsProxy
+from gcloud_requests import CloudStorageRequestsProxy
 
 proxy = CloudStorageRequestsProxy()
 client = storage.Client(credentials=proxy.credentials, _http=proxy)
