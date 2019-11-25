@@ -84,11 +84,10 @@ class RequestsProxy(object):
                 return retry_auth()
             raise
 
-        response = session.request(
-            method, url, data=data, headers=headers,
-            timeout=self.TIMEOUT_CONFIG,
-            **kwargs
-        )
+        # Do not allow multiple timeout kwargs.
+        kwargs["timeout"] = self.TIMEOUT_CONFIG
+
+        response = session.request(method, url, data=data, headers=headers, **kwargs)
         if response.status_code in _refresh_status_codes and refresh_attempts < _max_refresh_attempts:
             self.logger.info(
                 "Refreshing credentials due to a %s response. Attempt %s/%s.",
