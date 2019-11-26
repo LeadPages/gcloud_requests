@@ -170,14 +170,14 @@ def test_datastore_proxy_retries_token_refresh_errors(datastore_proxy):
     # RefreshError to be raised
     refresh_calls = []
 
-    @urlmatch(netloc="accounts.google.com", path="/o/oauth2/token")
+    @urlmatch(netloc=r"^(oauth2\.googleapis\.com|accounts\.google\.com)$", path=r"^/(o/oauth2/token|token)$")
     def refresh(netloc, request):
         refresh_calls.append(1)
         if sum(refresh_calls) == 1:
             return {
                 "status_code": 500,
-                "headers": {"content-type": "text/html"},
-                "content": "<h1>Error</h1>",
+                "headers": {"content-type": "application/json"},
+                "content": json.dumps({"error_description": "test error"}),
             }
         # Pass through to the real impl.
         return None
@@ -186,6 +186,9 @@ def test_datastore_proxy_retries_token_refresh_errors(datastore_proxy):
         # If I make a request
         response = datastore_proxy.request("GET", "http://example.com")
 
-        # I expect it to succeed
-        assert response.status_code == 200
-        assert response.content == b"{}"
+    # I expect it to succeed
+    assert response.status_code == 200
+    assert response.content == b"{}"
+
+    # And one refresh call to have occurred
+    assert sum(refresh_calls) == 1
