@@ -13,6 +13,7 @@ google-cloud-storage>=1.1.1,<2.0
 # Testing
 futures
 httmock
+mock
 pytest>=3
 pytest-cov
 tox
