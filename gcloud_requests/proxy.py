@@ -62,7 +62,13 @@ class RequestsProxy(object):
         _credentials_watcher.watch(credentials)
 
     def __del__(self):
-        _credentials_watcher.unwatch(self.credentials)
+        try:
+            _credentials_watcher.unwatch(self.credentials)
+        except TypeError:
+            # This can happen when the daemon thread shuts down and
+            # __del__() is implicitly ran. Crops up most commonly
+            # in test suites as 'NoneType' object is not callable.
+            pass
 
     def request(self, method, url, data=None, headers=None, retries=0, refresh_attempts=0, **kwargs):
         session = self._get_session()
