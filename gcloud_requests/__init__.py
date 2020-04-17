@@ -4,4 +4,4 @@ from .datastore import DatastoreRequestsProxy, enter_transaction, exit_transacti
 from .pubsub import PubSubRequestsProxy  # noqa
 from .storage import CloudStorageRequestsProxy  # noqa
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
