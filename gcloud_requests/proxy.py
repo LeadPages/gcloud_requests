@@ -52,6 +52,11 @@ class RequestsProxy(object):
         14: "UNAVAILABLE",
     }
 
+    # Fix for GCS client setting ALLOW_AUTO_SWITCH_TO_MTLS_URL to True
+    # unless an api_endpoint client_option is set
+    # https://github.com/googleapis/python-cloud-core/pull/75/files
+    is_mtls = False
+
     def __init__(self, credentials=None, logger=None):
         if credentials is None:
             credentials = google.auth.default()[0]
