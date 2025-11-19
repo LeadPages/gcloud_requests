@@ -17,7 +17,7 @@ class CredentialsWatcher(Thread):
 
     def __init__(self):
         super(CredentialsWatcher, self).__init__()
-        self.setDaemon(True)
+        self.daemon = True
         self.watch_list_updated = Condition()
         self.watch_list = []
         self.logger = logging.getLogger("gcloud_requests.CredentialsWatcher")

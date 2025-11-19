@@ -34,10 +34,17 @@ class RequestsProxy(object):
     TIMEOUT_CONFIG = (3.05, 30)
 
     #: Determines how retries should be handled by this proxy.
-    RETRY_CONFIG = Retry(
-        total=10, connect=10, read=5,
-        method_whitelist=Retry.DEFAULT_METHOD_WHITELIST | frozenset(["POST"])
-    )
+    # Handle compatibility between old urllib3 (method_whitelist) and new (allowed_methods)
+    _retry_kwargs = {
+        "total": 10,
+        "connect": 10,
+        "read": 5,
+    }
+    if hasattr(Retry, "DEFAULT_METHOD_WHITELIST"):
+        _retry_kwargs["method_whitelist"] = Retry.DEFAULT_METHOD_WHITELIST | frozenset(["POST"])
+    elif hasattr(Retry, "DEFAULT_ALLOWED_METHODS"):
+        _retry_kwargs["allowed_methods"] = Retry.DEFAULT_ALLOWED_METHODS | frozenset(["POST"])
+    RETRY_CONFIG = Retry(**_retry_kwargs)
 
     #: The number of connections to pool per Session.
     CONNECTION_POOL_SIZE = 32
