@@ -22,6 +22,27 @@ steps:
         ls -la /workspace
         git log
 
+  - name: python:3.11-alpine
+    id: "Lint"
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        # Create pip and auth dirs
+        mkdir -p /root/.pip
+        mkdir -p /root
+
+        # Link workspace configs into expected locations
+        ln -sf /workspace/pip.conf /root/.pip/pip.conf
+        ln -sf /workspace/netrc /root/.netrc
+        ln -sf /workspace/cloudbuild_pypirc /root/.pypirc
+
+        # Install flake8 using the correct pip config
+        pip install flake8
+
+        # Run linting
+        flake8 gcloud_requests tests
+
   - name: python:2.7-alpine
     id: "Test: Inside Python-2.7"
     entrypoint: sh

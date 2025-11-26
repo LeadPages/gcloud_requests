@@ -30,6 +30,11 @@ run: netrc pip.conf cloudbuild_pypirc ${HOME}/.config/gcloud/application_default
 	  python:$(PY_VERSION)-alpine \
 	  /bin/sh -c "/workspace/ci/runtests.sh onlysetup; exec /bin/sh"
 
+lint:
+	$(DOCKER) run --rm \
+	  -v $(CURDIR):/workspace \
+	  python:3.11-alpine sh -c "pip install flake8 && flake8 /workspace/gcloud_requests /workspace/tests"
+
 test: netrc pip.conf cloudbuild_pypirc ${HOME}/.config/gcloud/application_default_credentials.json
 	$(DOCKER) run -it --rm=true --name=$(PROJECT)_$@ \
 	  -v $(CURDIR):/workspace \
