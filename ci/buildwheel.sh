@@ -13,7 +13,7 @@ function setup_app() {
   cp -ar /workspace/tests                /app/tests
   # copy, don't link, because we change it with `sed`
   cp -v /workspace/requirements.txt     /app/requirements.txt
-  ln -s /workspace/requirements_dev.txt /app/requirements_dev.txt
+  ln -s /workspace/requirements-dev.txt /app/requirements-dev.txt
   ln -s /workspace/setup.cfg            /app/setup.cfg
   ln -s /workspace/setup.py             /app/setup.py
 }

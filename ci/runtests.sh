@@ -13,33 +13,32 @@ function setup_app() {
   cp -ar /workspace/tests                /app/tests
   # copy, don't link, because we changeit with `sed`
   cp -v /workspace/requirements.txt     /app/requirements.txt
-  ln -s /workspace/requirements_dev.txt /app/requirements_dev.txt
+  ln -s /workspace/requirements-dev.txt /app/requirements-dev.txt
   ln -s /workspace/setup.cfg            /app/setup.cfg
   ln -s /workspace/setup.py             /app/setup.py
 }
 
-function run_tests() {
+function setup_env() {
   cd /app
-
-  # Runtime with venv -> 3m:23s, without venv -> 2m:43s
   # this is a throwaway container, venv not needed!
-  #pip install virtualenv
-  #virtualenv .venv
-  #. .venv/bin/activate
 
-  export HOME=/root      # this is a cloudbuild problem!!!!
-
-  sed -i requirements.txt -e "s:^six$:six==1.15:"
   ls -la
-  cat requirements.txt requirements_dev.txt
-  pip install -r requirements_dev.txt
-  py.test tests
+  cat requirements.txt requirements-dev.txt
+  pip install -r requirements-dev.txt
 }
 
 function main() {
+  local onlysetup=$1
+  export HOME=/root      # this is a cloudbuild problem!!!!
   setup_root
   setup_app
-  run_tests
+  setup_env
+  if [ x"${onlysetup}" != x"onlysetup" ]; then
+    echo "RUNNING TESTS: onlysetup=<${onlysetup}>"
+    py.test -sv tests
+  else
+    echo "ONLY PREPARE ENV: onlysetup=<${onlysetup}>"
+  fi
 }
 
 main $@
