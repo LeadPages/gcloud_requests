@@ -1,0 +1,73 @@
+steps:
+  # Pulls down the netrc and pip conf files we need to access our private npm registry.
+  # This file is stored within the context of this build, and becomes accessible to the CI image
+  # via a volume mount.
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    id: "Prepare: Copy over npm/pip/net config files from bucket"
+    entrypoint: "gsutil"
+    args:
+      - cp
+      - gs://center-builds/pypi/netrc
+      - gs://center-builds/pypi/pip.conf
+      - gs://center-builds/pypi/cloudbuild_pypirc
+      - .
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    id: "Test the git checkout"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        ls -la /
+        ls -la /workspace
+        git log
+
+  - name: python:2.7-alpine
+    id: "Test: Inside Python-2.7"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.6-alpine
+    id: "Test: Inside Python-3.6"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.7-alpine
+    id: "Test: Inside Python-3.7"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.8-alpine
+    id: "Test: Inside Python-3.8"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.9-alpine
+    id: "Test: Inside Python-3.9"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.11-alpine
+    id: "Test: Inside Python-3.11"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+
+  - name: python:3.11-alpine
+    id: "Build and Publish: create and upload library"
+    entrypoint: sh
+    env:
+      - 'BUILD_TYPE=$_BUILD_TYPE'  # Safe-Guard inside buildwheel.sh
+    args:
+      - -c
+      - |
+        if [ x"$_BUILD_TYPE" == x"release" ]; then
+          /workspace/ci/buildwheel.sh
+        else
+          echo "_BUILD_TYPE is <$_BUILD_TYPE> -> DO NOT build a wheel publish."
+        fi
