@@ -1,3 +1,6 @@
+substitutions:
+  _LATEST_SUPPORTED_PY_VERSION: 3.11
+
 steps:
   # Pulls down the netrc and pip conf files we need to access our private npm registry.
   # This file is stored within the context of this build, and becomes accessible to the CI image
@@ -22,7 +25,7 @@ steps:
         ls -la /workspace
         git log
 
-  - name: python:3.11-alpine
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
     id: "Lint"
     entrypoint: sh
     args:
@@ -73,13 +76,13 @@ steps:
     args:
       - /workspace/ci/runtests.sh
 
-  - name: python:3.11-alpine
-    id: "Test: Inside Python-3.11"
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
+    id: "Test: Inside Python-${_LATEST_SUPPORTED_PY_VERSION}"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
 
-  - name: python:3.11-alpine
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
     id: "Build and Publish: create and upload library"
     entrypoint: sh
     env:
