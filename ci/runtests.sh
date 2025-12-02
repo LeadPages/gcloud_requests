@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 function setup_root() {
   mkdir /root/.pip && ln -s /workspace/pip.conf /root/.pip/pip.conf
   ln -s /workspace/netrc                 /root/.netrc

@@ -1,5 +1,9 @@
 substitutions:
   _LATEST_SUPPORTED_PY_VERSION: 3.11
+  _DATASTORE_PROJECT_ID: lp-infra-lab
+  _DATASTORE_DATASET: lp-infra-lab
+  _GOOGLE_CLOUD_PROJECT: lp-infra-lab
+  _GCLOUD_PROJECT: lp-infra-lab
 
 steps:
   # Pulls down the netrc and pip conf files we need to access our private npm registry.
@@ -46,41 +50,72 @@ steps:
         # Run linting
         flake8 gcloud_requests tests
 
-  - name: python:2.7-alpine
+  # We need to rebuild from source with alpine image, so for python 2.7, we dont use alpine
+  - name: python:2.7
     id: "Test: Inside Python-2.7"
-    entrypoint: sh
+    entrypoint: bash
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:3.6-alpine
     id: "Test: Inside Python-3.6"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:3.7-alpine
     id: "Test: Inside Python-3.7"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:3.8-alpine
     id: "Test: Inside Python-3.8"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:3.9-alpine
     id: "Test: Inside Python-3.9"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
     id: "Test: Inside Python-${_LATEST_SUPPORTED_PY_VERSION}"
     entrypoint: sh
     args:
       - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
 
   - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
     id: "Build and Publish: create and upload library"
