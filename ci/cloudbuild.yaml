@@ -1,5 +1,5 @@
 substitutions:
-  _LATEST_SUPPORTED_PY_VERSION: 3.11
+  _LATEST_SUPPORTED_PY_VERSION: "3.11"
   _DATASTORE_PROJECT_ID: lp-infra-lab
   _DATASTORE_DATASET: lp-infra-lab
   _GOOGLE_CLOUD_PROJECT: lp-infra-lab
