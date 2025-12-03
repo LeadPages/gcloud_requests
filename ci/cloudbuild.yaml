@@ -133,4 +133,5 @@ steps:
 
 logsBucket: gs://leadpage-dev_cloudbuild/cloudbuild_logs
 options:
+  machineType: 'E2_HIGHCPU_8' # We need these extra cores to run these unit tests for python 2, else it takes 20 minutes
   logging: GCS_ONLY
