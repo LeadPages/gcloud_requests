@@ -63,8 +63,8 @@ it must be handled in three locations:
    must be adjusted to include (or exclude) the versions in question.
 2. in `ci/cloudbuild.yaml` steps need to be added (or removed) to address
    the different versions of Python as well.
-3. in `ci/cloudbuild.yaml` the last step (build wheel and publish) shall use
-   the highest version of Python that is supported in the library.
+3. in `ci/cloudbuild.yaml`, update the `_LATEST_SUPPORTED_PY_VERSION` to the 
+   latest supporeted python version.
 
 # Building a Pre-Release version
 
