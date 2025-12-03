@@ -130,3 +130,7 @@ steps:
         else
           echo "_BUILD_TYPE is <$_BUILD_TYPE> -> DO NOT build a wheel publish."
         fi
+
+logsBucket: gs://leadpage-dev_cloudbuild/cloudbuild_logs
+options:
+  logging: GCS_ONLY
