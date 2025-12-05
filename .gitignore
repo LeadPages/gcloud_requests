@@ -7,3 +7,9 @@ __pycache__
 /dist
 /gcloud_requests.egg-info
 /htmlcov
+cloudbuild_pypirc
+netrc
+pip.conf
+gcloud
+build
+dist

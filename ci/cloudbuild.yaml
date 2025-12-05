@@ -1,0 +1,136 @@
+substitutions:
+  _LATEST_SUPPORTED_PY_VERSION: "3.11"
+  _DATASTORE_PROJECT_ID: lp-infra-lab
+  _DATASTORE_DATASET: lp-infra-lab
+  _GOOGLE_CLOUD_PROJECT: lp-infra-lab
+  _GCLOUD_PROJECT: lp-infra-lab
+
+steps:
+  # Pulls down the netrc and pip conf files we need to access our private npm registry.
+  # This file is stored within the context of this build, and becomes accessible to the CI image
+  # via a volume mount.
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    id: "Prepare: Copy over npm/pip/net config files from bucket"
+    entrypoint: "gsutil"
+    args:
+      - cp
+      - gs://center-builds/pypi/netrc
+      - gs://center-builds/pypi/pip.conf
+      - gs://center-builds/pypi/cloudbuild_pypirc
+      - .
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    id: "Test the git checkout"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        ls -la /
+        ls -la /workspace
+        git log
+
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
+    id: "Lint"
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        # Create pip and auth dirs
+        mkdir -p /root/.pip
+
+        # Link workspace configs into expected locations
+        ln -sf /workspace/pip.conf /root/.pip/pip.conf
+        ln -sf /workspace/netrc /root/.netrc
+        ln -sf /workspace/cloudbuild_pypirc /root/.pypirc
+
+        # Install flake8 using the correct pip config
+        pip install flake8
+
+        # Run linting
+        flake8 gcloud_requests tests
+
+  # We need to rebuild from source with alpine image, so for python 2.7, we dont use alpine
+  - name: python:2.7
+    id: "Test: Inside Python-2.7"
+    entrypoint: bash
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:3.6-alpine
+    id: "Test: Inside Python-3.6"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:3.7-alpine
+    id: "Test: Inside Python-3.7"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:3.8-alpine
+    id: "Test: Inside Python-3.8"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:3.9-alpine
+    id: "Test: Inside Python-3.9"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
+    id: "Test: Inside Python-${_LATEST_SUPPORTED_PY_VERSION}"
+    entrypoint: sh
+    args:
+      - /workspace/ci/runtests.sh
+    env:
+    - DATASTORE_PROJECT_ID=${_DATASTORE_PROJECT_ID}
+    - DATASTORE_DATASET=${_DATASTORE_DATASET}
+    - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    - GCLOUD_PROJECT=${_GCLOUD_PROJECT}
+
+  - name: python:${_LATEST_SUPPORTED_PY_VERSION}-alpine
+    id: "Build and Publish: create and upload library"
+    entrypoint: sh
+    env:
+      - 'BUILD_TYPE=$_BUILD_TYPE'  # Safe-Guard inside buildwheel.sh
+    args:
+      - -c
+      - |
+        if [ x"$_BUILD_TYPE" == x"release" ]; then
+          /workspace/ci/buildwheel.sh
+        else
+          echo "_BUILD_TYPE is <$_BUILD_TYPE> -> DO NOT build a wheel publish."
+        fi
+
+logsBucket: gs://leadpage-dev_cloudbuild/cloudbuild_logs
+options:
+  machineType: 'E2_HIGHCPU_8' # We need these extra cores to run these unit tests for python 2, else it takes 20 minutes
+  logging: GCS_ONLY
