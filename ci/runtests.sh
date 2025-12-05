@@ -9,10 +9,10 @@ function setup_root() {
 function setup_app() {
   mkdir /app && cd /app
   # copy, because we wanna be able to toss out __pychache__ and *.pyc files
-  cp -ar /workspace/gcloud_requests      /app/gcloud_requests
-  cp -ar /workspace/tests                /app/tests
-  # copy, don't link, because we changeit with `sed`
-  cp -v /workspace/requirements.txt     /app/requirements.txt
+  ln -s /workspace/gcloud_requests      /app/gcloud_requests
+  ln -s /workspace/tests                /app/tests
+
+  ln -s /workspace/requirements.txt     /app/requirements.txt
   ln -s /workspace/requirements-dev.txt /app/requirements-dev.txt
   ln -s /workspace/setup.cfg            /app/setup.cfg
   ln -s /workspace/setup.py             /app/setup.py

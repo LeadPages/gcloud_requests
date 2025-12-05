@@ -37,7 +37,6 @@ steps:
       - |
         # Create pip and auth dirs
         mkdir -p /root/.pip
-        mkdir -p /root
 
         # Link workspace configs into expected locations
         ln -sf /workspace/pip.conf /root/.pip/pip.conf
