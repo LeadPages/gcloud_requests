@@ -11,7 +11,7 @@ google-cloud-datastore>=1.6,<2.0
 google-cloud-storage>=1.1.1,<2.0
 
 # Testing
-futures
+futures; python_version < "3"
 httmock
 mock
 pytest>=3

@@ -170,7 +170,13 @@ def test_datastore_proxy_retries_token_refresh_errors(datastore_proxy):
     # RefreshError to be raised
     refresh_calls = []
 
-    @urlmatch(netloc=r"^(oauth2\.googleapis\.com|accounts\.google\.com)$", path=r"^/(o/oauth2/token|token)$")
+    # Match BOTH:
+    #  - OAuth2 token endpoints (local/docker)
+    #  - GCE metadata token endpoint (Cloud Build / GCE)
+    @urlmatch(
+        netloc=r"^(oauth2\.googleapis\.com|accounts\.google\.com|metadata\.google\.internal)$",
+        path=r".*token.*",
+    )
     def refresh(netloc, request):
         refresh_calls.append(1)
         if sum(refresh_calls) == 1:
